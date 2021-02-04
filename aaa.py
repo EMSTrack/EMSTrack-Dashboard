@@ -8,7 +8,19 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 import pandas as pd
+import requests
+import time
+from datetime import datetime
+import dateutil.parser
+import os
+import yaml
 
+import numpy as np
+import matplotlib.pyplot as plt
+import folium
+from folium import plugins
+
+import plotly.graph_objects as go # or plotly.express as px
 
 from datetime import date
 import re
@@ -197,7 +209,7 @@ app.layout = html.Div(className="p-5", children=[
 
     dcc.Graph(
         id='example-graph',
-        figure=fig
+        figure=get_fig()
     ),
 
 
