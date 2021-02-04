@@ -191,6 +191,7 @@ fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
 
 app.layout = html.Div(className="p-5", children=[
     html.H1(children='Mileage Report'),
+    html.H3(id='button-clicks'),
 
     html.Div([
         dcc.DatePickerRange(
@@ -203,13 +204,13 @@ app.layout = html.Div(className="p-5", children=[
         html.Div(id='output-container-date-picker-range')
     ]),
 
-    dbc.Button("Generate", className="mr-2",),
+    dbc.Button("Generate", id='generate', className="mr-2"),
     dbc.Button("Reset", className="mr-2"),
     dbc.Button("Export", className="mr-2 "),
 
     dcc.Graph(
-        id='example-graph',
-        figure=get_fig()
+        id='map-graph',
+        figure=fig
     ),
 
 
@@ -225,12 +226,12 @@ app.layout = html.Div(className="p-5", children=[
 
 )
 
-
 @app.callback(
-    dash.dependencies.Output('output-container-date-picker-range', 'children'),
+    dash.dependencies.Output('map-graph', 'figure'),
     [dash.dependencies.Input('my-date-picker-range', 'start_date'),
-     dash.dependencies.Input('my-date-picker-range', 'end_date')])
-def update_output(start_date, end_date):
+     dash.dependencies.Input('my-date-picker-range', 'end_date'),
+     dash.dependencies.Input('generate', 'n_clicks')])
+def update_output(start_date, end_date, n_clicks):
     string_prefix = 'You have selected: '
     if start_date is not None:
         start_date_object = date.fromisoformat(start_date)
@@ -240,10 +241,15 @@ def update_output(start_date, end_date):
         end_date_object = date.fromisoformat(end_date)
         end_date_string = end_date_object.strftime('%B %d, %Y')
         string_prefix = string_prefix + 'End Date: ' + end_date_string
-    if len(string_prefix) == len('You have selected: '):
-        return 'Select a date to see it displayed here'
-    else:
-        return string_prefix
+    if n_clicks is not None:
+        app.logger.info(start_date)
+        app.logger.info(end_date)
+        return get_fig()
+    return fig
+    # if len(string_prefix) == len('You have selected: '):
+    #     return 'Select a date to see it displayed here'
+    # else:
+    #     return string_prefix
 
 
 if __name__ == '__main__':
