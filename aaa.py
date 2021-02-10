@@ -10,7 +10,7 @@ import plotly.express as px
 import pandas as pd
 import requests
 import time
-from datetime import datetime
+import datetime
 import dateutil.parser
 import os
 import yaml
@@ -87,7 +87,7 @@ def splitlotlan(row):
 #
 # fig.show()
 
-def get_fig():
+def get_fig(start, end):
     global cfg
     global base_url
     with open("config.yml", 'r') as ymlfile:
@@ -103,7 +103,7 @@ def get_fig():
     for ambulance in ambulances:
         id = ambulance['id']
         # data = get(f'ambulance/{id}/updates/').json()#'?filter=2019-10-01T15:00:00.000Z,2020-10-30T15:00:00.000Z').json()
-        data = get(f'ambulance/{id}/updates/?filter=2019-10-01T15:00:00.000Z,2020-10-30T15:00:00.000Z').json()
+        data = get(f'ambulance/{id}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
         data = [{'id':id, 'identifier':ambulance['identifier'], **item} for item in data]
         df = df.append(pd.DataFrame(data))
         #print(data)
@@ -178,17 +178,6 @@ ALLOWED_TYPES = (
 
 # app = dash.Dash(external_stylesheets=[])
 
-# assume you have a "long-form" data frame
-# see https://plotly.com/python/px-arguments/ for more options
-df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-})
-
-fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
-
-
 app.layout = html.Div(className="p-5", children=[
     html.H1(children='Mileage Report'),
     html.H3(id='button-clicks'),
@@ -197,9 +186,9 @@ app.layout = html.Div(className="p-5", children=[
         dcc.DatePickerRange(
              id='my-date-picker-range',
              min_date_allowed=date(1995, 8, 5),
-             max_date_allowed=date(2017, 9, 19),
-             initial_visible_month=date(2017, 8, 5),
-             end_date=date(2017, 8, 25)
+             max_date_allowed=date.today() + datetime.timedelta(days = 1),
+             initial_visible_month=date.today(),
+             end_date=date.today()
              ),
         html.Div(id='output-container-date-picker-range')
     ]),
@@ -210,16 +199,9 @@ app.layout = html.Div(className="p-5", children=[
 
     dcc.Graph(
         id='map-graph',
-        figure=fig
+        figure=get_fig(date(2019, 10, 1), date(2020, 10, 30))
     ),
 
-
-
-
-    dbc.Container(
-        dbc.Alert("Hello Bootstrap!", color="success"),
-        className="p-5",
-    )
 ]
 
 
@@ -242,10 +224,9 @@ def update_output(start_date, end_date, n_clicks):
         end_date_string = end_date_object.strftime('%B %d, %Y')
         string_prefix = string_prefix + 'End Date: ' + end_date_string
     if n_clicks is not None:
-        app.logger.info(start_date)
-        app.logger.info(end_date)
-        return get_fig()
-    return fig
+        app.logger.info(string_prefix)
+        return get_fig(start_date, end_date)
+    return get_fig(date(2019, 10, 1), date(2020, 10, 30))
     # if len(string_prefix) == len('You have selected: '):
     #     return 'Select a date to see it displayed here'
     # else:
