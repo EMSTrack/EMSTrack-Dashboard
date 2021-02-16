@@ -138,17 +138,33 @@ def splitlotlan(row):
 #
 # fig.show()
 
-def get_fig(start, end):
+dict_ambulances = {}
+
+def init_dict_ambulances ():
+    ambulances = get_ambulances()
+    for amb in ambulances:
+        if amb["id"] not in dict_ambulances.keys():
+            dict_ambulances[amb["id"]] = {"name": amb["identifier"], "dict_calls": [{"location": amb["location"], "timestamp": amb["timestamp"]}]}
+        else:
+            dict_ambulances[amb["id"]]["dict_calls"].append({"location": amb["location"], "timestamp": amb["timestamp"]})
+
+def get_ambulances():
     global cfg
     global base_url
     with open("config.yml", 'r') as ymlfile:
         cfg = yaml.safe_load(ymlfile)
-    SERVER = 'EMSTrack'
+    SERVER = 'UCSD'
     cfg = cfg[SERVER]
     base_url = cfg['url']
 
     res = get('ambulance')
     ambulances = res.json()
+
+    return ambulances
+
+def get_fig(start, end):
+    ambulances = get_ambulances()
+    # app.logger.info(ambulances)
     vehicles = {}
     df = pd.DataFrame()
     for ambulance in ambulances:
@@ -158,7 +174,10 @@ def get_fig(start, end):
             f'ambulance/{id}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
         data = [{'id': id, 'identifier': ambulance['identifier'], **item}
                 for item in data]
+        # if len(data) != 0:
+            # app.logger.info(data[0])
         df = df.append(pd.DataFrame(data))
+        # app.logger.info(df)
         # print(data)
         vehicles[id] = {'ambulance': ambulance, 'data': data}
     df = df.apply(splitlotlan, axis=1).dropna()
@@ -371,7 +390,8 @@ def update_output(start_date, end_date, n_clicks):
         end_date_string = end_date_object.strftime('%B %d, %Y')
         string_prefix = string_prefix + 'End Date: ' + end_date_string
     if n_clicks is not None:
-        app.logger.info(string_prefix)
+        init_dict_ambulances()
+        # app.logger.info(dict_ambulances)
         return get_fig(start_date, end_date)
     return get_fig(date(2019, 10, 1), date(2020, 10, 30))
     # if len(string_prefix) == len('You have selected: '):
