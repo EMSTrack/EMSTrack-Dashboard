@@ -17,6 +17,8 @@ import dateutil.parser
 import os
 import yaml
 
+
+import random 
 import numpy as np
 import matplotlib.pyplot as plt
 import folium
@@ -265,6 +267,79 @@ ALLOWED_TYPES = (
     "tel", "url", "range", "hidden",
 )
 
+
+
+
+def get_random_color(pastel_factor = 0.5):
+    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
+
+def color_distance(c1,c2):
+    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
+
+def generateo_new_color(existing_colors,pastel_factor = 0.5):
+    max_distance = None
+    best_color = None
+    for i in range(0,100):
+        color = get_random_color(pastel_factor = pastel_factor)
+        if not existing_colors:
+            return color
+        best_distance = min([color_distance(color,c) for c in existing_colors])
+        if not max_distance or best_distance > max_distance:
+            max_distance = best_distance
+            best_color = color
+    return best_color
+
+
+def generate_new_color():
+        rand = lambda: random.randint(100, 255)
+        return '#%02X%02X%02X' % (rand(), rand(), rand())
+
+
+
+def generate_ambulance_card(ambulance_id):
+    app.logger.info('ambulance ambulanc ideop')
+    # app.logger.info(ambulance_id)
+    # app.logger.info(dict_ambulances[ambulance_id])
+
+
+    
+    color_sample = generate_new_color()
+
+    # colors.append(color_sample,pastel_factor = 0.9)
+      
+
+      
+      
+    app.logger.info(color_sample)
+
+    
+    single_ambulance = dict_ambulances[ambulance_id]
+    return dbc.Card([
+        dbc.CardBody(
+            [
+                html.H4(single_ambulance["name"],
+                        className="card-title"),
+                html.P(
+                    str(single_ambulance["dict_calls"]),
+                    className="card-text",
+                ),
+                dbc.Button(
+                    "Go", color="primary"),
+            ]
+        ),
+    ],
+        className="m-3",
+        # color = color_sample,
+        style={"backgroundColor": color_sample},
+
+    )
+
+    # return dbc.Button(children=str(team_shortName),
+    #                   color="primary",
+    #                   className="mr-1",
+    #                   id=str(team_shortName))
+    
+    
 # app = dash.Dash(external_stylesheets=[])
 
 #  html.Div(className = "container-sm", children = [
@@ -276,6 +351,13 @@ app.layout = html.Div(children=[
         html.H1(children='Mileage Report', className="mb-4"),
 
         html.H3(id='button-clicks'),
+        
+        
+        dcc.Input(
+            id='input-field',
+            type='text',
+        ),
+
 
         dbc.Row(
             [
@@ -299,83 +381,17 @@ app.layout = html.Div(children=[
         dbc.Row(
             [
                 dbc.Col([
-                    dbc.Card([
-                        dbc.CardBody(
-                            [
-                                html.H4("ambulance title",
-                                        className="card-title"),
-                                html.P(
-                                    "title text",
-                                    className="card-text",
-                                ),
-                                dbc.Button(
-                                    "Go", color="primary"),
-                            ]
-                        ),
-                    ],
-                        className="m-3",
-                        # style={"width": "18rem"},
-                    ),
+                   
+                   
+                           html.H3(children='Testing Ambulances header'),
 
-                    dbc.Card([
-                        dbc.CardBody(
-                             [
-                                 html.H4("ambulance title",
-                                         className="card-title"),
-                                 html.P(
-                                     "title text",
-                                     className="card-text",
-                                 ),
-                                 dbc.Button(
-                                     "Go", color="primary"),
-                             ]
-                             ),
-                    ],
-                        className="m-3",
-                        # style={"width": "18rem"},
-                    ),
 
-                    dbc.Card([
-                        dbc.CardBody(
-                            [
-                                html.H4("ambulance title",
-                                        className="card-title"),
-                                html.P(
-                                    "title text",
-                                    className="card-text",
-                                ),
-                                dbc.Button(
-                                    "Go", color="primary"),
-                            ]
-                        ),
-                    ],
-                        className="m-3",
-                        # style={"width": "18rem"},
-                    ),
-
-                    dbc.Card([
-                        dbc.CardBody(
-                            [
-                                html.H4("ambulance title",
-                                        className="card-title"),
-                                html.P(
-                                    "title text",
-                                    className="card-text",
-                                ),
-                                dbc.Button(
-                                    "Go", color="primary"),
-                            ]
-                        ),
-                    ],
-                        className="m-3",
-                        # style={"width": "18rem"},
-                    ),
 
 
                     html.Div(
                         ""),
 
-                ], width=6, style=color_red),
+                ],  id='output-ambulances', width=6, style=color_red),
                 dbc.Col([
 
                     dcc.Graph(
@@ -392,6 +408,24 @@ app.layout = html.Div(children=[
 ]
 
 )
+
+
+@app.callback(
+    dash.dependencies.Output('output-ambulances', 'children'),
+    [dash.dependencies.Input('input-field', 'value')])
+def update_col(prop):
+
+    hrm = dbc.Col(children=[generate_ambulance_card(i)
+                            for i in dict_ambulances])
+
+    # hm = generate_ambulance_card(dict_ambulances["8"])
+
+    # hm = generate_ambulance_card(list(dict_ambulances.keys())[0])
+
+    app.logger.info(hrm)
+
+    return hrm
+
 
 @app.callback(
     dash.dependencies.Output('map-graph', 'figure'),
