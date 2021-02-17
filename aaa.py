@@ -140,13 +140,15 @@ def splitlotlan(row):
 
 dict_ambulances = {}
 
-def init_dict_ambulances ():
+def init_dict_ambulances(start, end):
     ambulances = get_ambulances()
     for amb in ambulances:
         if amb["id"] not in dict_ambulances.keys():
-            dict_ambulances[amb["id"]] = {"name": amb["identifier"], "dict_calls": [{"location": amb["location"], "timestamp": amb["timestamp"]}]}
-        else:
-            dict_ambulances[amb["id"]]["dict_calls"].append({"location": amb["location"], "timestamp": amb["timestamp"]})
+            dict_ambulances[amb["id"]] = {"name": amb["identifier"], "dict_calls": []}
+        data = get(
+            f'ambulance/{amb["id"]}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
+        for d in data: # insert at beginning, since api call gives us positions from newest to oldest
+            dict_ambulances[amb["id"]]["dict_calls"].insert(0, {"location": d["location"], "timestamp": d["timestamp"]})
 
 def get_ambulances():
     global cfg
@@ -162,9 +164,25 @@ def get_ambulances():
 
     return ambulances
 
+def get_ambulance_colors(ambulances):
+    colors = list(main_colors.values())
+    color_map = {}
+    i = 0 # cycle through all main colors
+    for ambulance in ambulances:
+        id = ambulance['id']
+        if id not in color_map:
+            color_map[id] = colors[i]
+            if i < len(colors) - 1:
+                i += 1
+            else:
+                i = 0
+    return color_map
+
 def get_fig(start, end):
     ambulances = get_ambulances()
-    # app.logger.info(ambulances)
+    ids = [ambulance['id'] for ambulance in ambulances]
+    init_dict_ambulances(start, end)
+    app.logger.info(dict_ambulances[ambulances[4]['id']])
     vehicles = {}
     df = pd.DataFrame()
     for ambulance in ambulances:
@@ -186,7 +204,8 @@ def get_fig(start, end):
     data = data.sort_values(by='timestamp', ascending=True).reset_index()
     center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
     fig = go.Figure()
-
+    color_map = get_ambulance_colors(ambulances)
+    # app.logger.info(color_map)
     for step in range(2, data.shape[0], 5):
         fig.add_trace(
             go.Scattermapbox(
