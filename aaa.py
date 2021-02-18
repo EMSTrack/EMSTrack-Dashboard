@@ -187,42 +187,77 @@ def get_ambulance_colors(ambulances):
                 i = 0
     return color_map
 
+def find_center():
+    center = {'lon': 0, 'lat': 0}
+    total_sum_long = 0
+    total_sum_lat = 0
+    total_calls_long = 0
+    total_calls_lat = 0
+    for id in dict_ambulances.keys():
+        for call in dict_ambulances[id]['dict_calls']:
+            total_sum_long += call['longitude']
+            total_sum_lat += call['latitude']
+            total_calls_long += 1
+            total_calls_lat += 1
+    
+    mean_long = total_sum_long/total_calls_long
+    mean_lat = total_sum_lat/total_calls_lat
+    center['lon'] = mean_long
+    center['lat'] = mean_lat
+    return center
+
 def get_fig(start, end):
     ambulances = get_ambulances()
     ids = [ambulance['id'] for ambulance in ambulances]
     init_dict_ambulances(start, end)
-    app.logger.info(dict_ambulances[ambulances[4]['id']])
-    vehicles = {}
-    df = pd.DataFrame()
-    for ambulance in ambulances:
-        id = ambulance['id']
-        # data = get(f'ambulance/{id}/updates/').json()#'?filter=2019-10-01T15:00:00.000Z,2020-10-30T15:00:00.000Z').json()
-        data = get(
-            f'ambulance/{id}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
-        data = [{'id': id, 'identifier': ambulance['identifier'], **item}
-                for item in data]
-        # if len(data) != 0:
-            # app.logger.info(data[0])
-        df = df.append(pd.DataFrame(data))
-        # app.logger.info(df)
-        # print(data)
-        vehicles[id] = {'ambulance': ambulance, 'data': data}
-    df = df.apply(splitlotlan, axis=1).dropna()
-    data = df
-    data['timestamp'] = pd.to_datetime(data.timestamp)
-    data = data.sort_values(by='timestamp', ascending=True).reset_index()
-    center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
+    # app.logger.info(dict_ambulances[ambulances[4]['id']])
+    # vehicles = {}
+    # df = pd.DataFrame()
+    # for ambulance in ambulances:
+    #     id = ambulance['id']
+    #     # data = get(f'ambulance/{id}/updates/').json()#'?filter=2019-10-01T15:00:00.000Z,2020-10-30T15:00:00.000Z').json()
+    #     data = get(
+    #         f'ambulance/{id}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
+    #     data = [{'id': id, 'identifier': ambulance['identifier'], **item}
+    #             for item in data]
+    #     # if len(data) != 0:
+    #         # app.logger.info(data[0])
+    #     df = df.append(pd.DataFrame(data))
+    #     # app.logger.info(df)
+    #     # print(data)
+    #     vehicles[id] = {'ambulance': ambulance, 'data': data}
+    # df = df.apply(splitlotlan, axis=1).dropna()
+    # data = df
+    # data['timestamp'] = pd.to_datetime(data.timestamp)
+    # data = data.sort_values(by='timestamp', ascending=True).reset_index()
+    # center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
     fig = go.Figure()
     color_map = get_ambulance_colors(ambulances)
     # app.logger.info(color_map)
-    for step in range(2, data.shape[0], 5):
-        fig.add_trace(
-            go.Scattermapbox(
-                visible=False,
-                mode="markers+lines",
-                lon=data.loc[:step:5, 'lon'],
-                lat=data.loc[:step:5, 'lat'],
-                marker={'size': 10}))
+    # for step in range(2, data.shape[0], 5):
+    #     fig.add_trace(
+    #         go.Scattermapbox(
+    #             visible=False,
+    #             mode="markers+lines",
+    #             lon=data.loc[:step:5, 'lon'],
+    #             lat=data.loc[:step:5, 'lat'],
+    #             marker={'size': 10}))
+
+    for id in dict_ambulances.keys():
+        # for step in range(2, data.shape[0], 5):
+        for i in range(0, len(dict_ambulances[id]['dict_calls']), 5): # need to fix later
+            sublist = dict_ambulances[id]['dict_calls'][:i]
+            sublist_long = [location['location']['longitude'] for location in sublist]
+            sublist_lat = [location['location']['latitude'] for location in sublist]
+            fig.add_trace(
+                go.Scattermapbox(
+                    visible=False,
+                    mode="markers+lines",
+                    lon=sublist_long,
+                    lat=sublist_lat,
+                    marker={'size': 10, 'color':color_map[id]}))
+    # center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
+    center = {'lat': 32.9237218, 'lon': -117.2201211}
 
     fig.update_layout(
         margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
@@ -423,7 +458,7 @@ def update_col(prop):
 
     # hm = generate_ambulance_card(list(dict_ambulances.keys())[0])
 
-    app.logger.info(hrm)
+    # app.logger.info(hrm)
 
     return hrm
 
