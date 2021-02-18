@@ -195,8 +195,8 @@ def find_center():
     total_calls_lat = 0
     for id in dict_ambulances.keys():
         for call in dict_ambulances[id]['dict_calls']:
-            total_sum_long += call['longitude']
-            total_sum_lat += call['latitude']
+            total_sum_long += call['location']['longitude']
+            total_sum_lat += call['location']['latitude']
             total_calls_long += 1
             total_calls_lat += 1
     
@@ -256,8 +256,8 @@ def get_fig(start, end):
                     lon=sublist_long,
                     lat=sublist_lat,
                     marker={'size': 10, 'color':color_map[id]}))
-    # center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
-    center = {'lat': 32.9237218, 'lon': -117.2201211}
+
+    center = find_center()
 
     fig.update_layout(
         margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
@@ -339,7 +339,7 @@ def generate_new_color():
 
 
 def generate_ambulance_card(ambulance_id):
-    app.logger.info('ambulance ambulanc ideop')
+    # app.logger.info('ambulance ambulanc ideop')
     # app.logger.info(ambulance_id)
     # app.logger.info(dict_ambulances[ambulance_id])
 
