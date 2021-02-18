@@ -255,7 +255,7 @@ def get_fig(start, end):
                     mode="markers+lines",
                     lon=sublist_long,
                     lat=sublist_lat,
-                    marker={'size': 10, 'color':color_map[id]}))
+                    marker={'size': 10, 'color':dict_ambulances[id]['ambulance_color']}))
 
     center = find_center()
 
@@ -268,7 +268,7 @@ def get_fig(start, end):
     )
 
     fig.data[0].visible = True
-
+    # app.logger.info(fig.data)
     steps = []
     for i in range(len(fig.data)):
         step = dict(
@@ -280,7 +280,7 @@ def get_fig(start, end):
         steps.append(step)
 
     sliders = [dict(
-        active=10,
+        active=1,
         currentvalue={"prefix": "Frequency: "},
         pad={"t": 50},
         steps=steps
