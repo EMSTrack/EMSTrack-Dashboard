@@ -314,6 +314,9 @@ def generate_ambulance_card(ambulance_id):
 
     
     single_ambulance = dict_ambulances[ambulance_id]
+    
+    
+    dict_ambulances[ambulance_id]["ambulance_color"] = color_sample
     return dbc.Card([
         dbc.CardBody(
             [
