@@ -144,9 +144,16 @@ dict_ambulances = {}
 
 def init_dict_ambulances(start, end):
     ambulances = get_ambulances()
+    
+
     for amb in ambulances:
+
         if amb["id"] not in dict_ambulances.keys():
-            dict_ambulances[amb["id"]] = {"name": amb["identifier"], "dict_calls": []}
+            color_sample = generate_new_color()
+
+            dict_ambulances[amb["id"]] = {"name": amb["identifier"], "dict_calls": [], "ambulance_color": color_sample}
+            
+            
         data = get(
             f'ambulance/{amb["id"]}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
         for d in data: # insert at beginning, since api call gives us positions from newest to oldest
@@ -303,20 +310,11 @@ def generate_ambulance_card(ambulance_id):
 
 
     
-    color_sample = generate_new_color()
-
-    # colors.append(color_sample,pastel_factor = 0.9)
-      
-
-      
-      
-    app.logger.info(color_sample)
 
     
     single_ambulance = dict_ambulances[ambulance_id]
     
     
-    dict_ambulances[ambulance_id]["ambulance_color"] = color_sample
     return dbc.Card([
         dbc.CardBody(
             [
@@ -333,7 +331,7 @@ def generate_ambulance_card(ambulance_id):
     ],
         className="m-3",
         # color = color_sample,
-        style={"backgroundColor": color_sample},
+        style={"backgroundColor": single_ambulance["ambulance_color"]},
 
     )
 
