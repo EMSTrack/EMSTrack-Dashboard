@@ -232,7 +232,7 @@ def get_fig(start, end):
     # data = data.sort_values(by='timestamp', ascending=True).reset_index()
     # center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
     fig = go.Figure()
-    color_map = get_ambulance_colors(ambulances)
+    # color_map = get_ambulance_colors(ambulances)
     # app.logger.info(color_map)
     # for step in range(2, data.shape[0], 5):
     #     fig.add_trace(
@@ -252,7 +252,7 @@ def get_fig(start, end):
             fig.add_trace(
                 go.Scattermapbox(
                     visible=False,
-                    mode="markers+lines",
+                    mode="markers",
                     lon=sublist_long,
                     lat=sublist_lat,
                     marker={'size': 10, 'color':dict_ambulances[id]['ambulance_color']}))
