@@ -205,7 +205,7 @@ def get_fig(start, end):
     color_map = get_ambulance_colors(ambulances)
     stepsize = 15
     # b = a.loc[a['id']==10, 'lon']
-    # app.logger.info(b)
+    # app.logger.info(data)
     for step in range(0, data.shape[0], stepsize):
         # colors = [color_map[id] for id in data.loc[step-stepsize:step:1, 'id']]
         # app.logger.info(data.loc[:step:stepsize, 'id'])
@@ -213,14 +213,17 @@ def get_fig(start, end):
         a = data.loc[:step:1]
         amb_name = a['id']
         unique_ids = a.id.unique()
-        app.logger.info("number of ambulances in iter {}: {}".format(
-            step, len(unique_ids)))
+        # app.logger.info(a)
+        # app.logger.info("number of ambulances in iter {}: {}".format(step, len(unique_ids)))
         lons = []
         lats = []
         colors = []
+        texts = []
+        timestamps = []
         for id in unique_ids:
-            lons.append(a.loc[a['id'] == id, 'lon'].iloc[-1])
-            lats.append(a.loc[a['id'] == id, 'lat'].iloc[-1])
+            lons.append(a.loc[a['id']==id, 'lon'].iloc[-1])
+            lats.append(a.loc[a['id']==id, 'lat'].iloc[-1])
+            texts.append(a.loc[a['id']==id, 'identifier'].iloc[-1] + " {}".format(a.loc[a['id']==id, 'timestamp'].iloc[-1]))
             colors.append(color_map[id])
         fig.add_trace(
             go.Scattermapbox(
@@ -228,9 +231,8 @@ def get_fig(start, end):
                 mode="markers",
                 lon=lons,
                 lat=lats,
-                text=amb_name, textposition="bottom right",
-                marker=go.scattermapbox.Marker(
-                    symbol='circle', color=colors, size=14),
+                text=texts,
+                marker=go.scattermapbox.Marker(symbol='circle', color=colors, size=14),
             )
         )
         #  marker = {'size': 20, 'symbol':   "airport", 'color':dict_ambulances[id]['ambulance_color'] },
@@ -262,15 +264,16 @@ def get_fig(start, end):
     for i in range(len(fig.data)):
         step = dict(
             method="update",
+            label="{}".format(i),
             args=[{"visible": [False] * len(fig.data)},
                   {"title": "Slider switched to step: " + str(i)}],  # layout attribute
         )
         step["args"][0]["visible"][i] = True  # Toggle i'th trace to "visible"
         steps.append(step)
     sliders = [dict(
-        active=1,
-        currentvalue={"prefix": "Frequency: "},
-        pad={"t": 50},
+        active=0,
+        currentvalue={"prefix": "Timestep: "},
+        pad={"t": 50, "b": 50, "l": 15, "r": 15},
         steps=steps
     )]
     fig.update_layout(
@@ -327,7 +330,7 @@ def generate_ambulance_card(ambulance_id):
                          ),
                          ], style = s_card_box),
                 dbc.Button(
-                    "Go", color="primary"),
+                    "Go", color="primary", className="mt-3"),
             ]
         ),
     ],
@@ -346,12 +349,13 @@ app.layout = html.Div(children=[
     html.Div(className="container",  style=main_container, children=[
         html.H1(children='Mileage Report', className="mb-4"),
         html.H3(id='button-clicks'),
-        dcc.Input(
-            id='input-field',
-            type='text',
-        ),
         dbc.Row(
             [
+                dcc.Input(
+                    id='input-field',
+                    type='text',
+                    className='mr-3'
+                ),
                 html.Div([
                     dcc.DatePickerRange(
                         id='my-date-picker-range',
@@ -384,9 +388,9 @@ app.layout = html.Div(children=[
                     html.H3(children='Testing Ambulances header'),
                     html.Div(
                         ""),
-                ],  id='output-ambulances', width=6, style=color_red),
+                ],  id='output-ambulances', width=12, style=color_red),
                 dbc.Col([
-                ], width=6, style=color_green),
+                ], width=0, style=color_green),
             ]
         ),
     ]),
