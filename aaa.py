@@ -318,10 +318,10 @@ def generate_ambulance_card(ambulance_id):
                 html.H4(single_ambulance["name"],
                         className="card-title"),
                 html.Div([
-                         html.P(
-                             str(single_ambulance["dict_calls"]),
-                             className="card-text", style={}
-                         ),
+                        #  html.P(
+                        #      str(single_ambulance["dict_calls"]),
+                        #      className="card-text", style={}
+                        #  ),
                          ], style = s_card_box),
                 dbc.Button(
                     "Go", color="primary", className="mt-3"),
