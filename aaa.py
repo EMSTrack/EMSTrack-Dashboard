@@ -205,7 +205,7 @@ def get_fig(start, end):
     fig = go.Figure()
     # app.logger.info(data.loc[:5:5, 'id'])
     color_map = get_ambulance_colors(ambulances)
-    app.logger.info(data.shape[0])
+    # app.logger.info(data.shape[0])
     stepsize = 1
     if(data.shape[0] > 50):
         stepsize = data.shape[0]//50
@@ -281,7 +281,7 @@ def get_fig(start, end):
     sliders = [dict(
         active=0,
         currentvalue={"prefix": "Timestep: "},
-        pad={"t": 50, "b": 50, "l": 40, "r": 40},
+        pad={"t": 25, "b": -10, "l": 40, "r": 40},
         steps=steps
     )]
     fig.update_layout(
@@ -322,9 +322,9 @@ def generate_ambulance_card(ambulance_id):
                         #      str(single_ambulance["dict_calls"]),
                         #      className="card-text", style={}
                         #  ),
-                         ], style = s_card_box),
-                dbc.Button(
-                    "Go", color="primary", className="mt-3"),
+                         ], style = s_card_box)
+                # dbc.Button(
+                #     "Go", color="primary", className="mt-3"),
             ]
         ),
     ],
@@ -348,7 +348,8 @@ app.layout = html.Div(children=[
                 dcc.Input(
                     id='input-field',
                     type='text',
-                    className='mr-3'
+                    className='mr-3',
+                    style={"display": "none"}
                 ),
                 html.Div([
                     dcc.DatePickerRange(
@@ -416,7 +417,7 @@ def update_output(start_date, end_date, n_clicks):
         end_date_string = end_date_object.strftime('%B %d, %Y')
         string_prefix = string_prefix + 'End Date: ' + end_date_string
     if n_clicks is not None:
-        init_dict_ambulances()
+        # init_dict_ambulances(start_date, end_date)
         # app.logger.info(dict_ambulances)
         return get_fig(start_date, end_date)
     return get_fig(date(2019, 10, 1), date(2020, 10, 30))
