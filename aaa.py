@@ -205,7 +205,10 @@ def get_fig(start, end):
     fig = go.Figure()
     # app.logger.info(data.loc[:5:5, 'id'])
     color_map = get_ambulance_colors(ambulances)
-    stepsize = 15
+    app.logger.info(data.shape[0])
+    stepsize = 1
+    if(data.shape[0] > 50):
+        stepsize = data.shape[0]//50
     # b = a.loc[a['id']==10, 'lon']
     # app.logger.info(data)
     for step in range(0, data.shape[0], stepsize):
@@ -221,11 +224,8 @@ def get_fig(start, end):
         lats = []
         colors = []
         texts = []
-        timestamps = []
-     
-            
-            
-            
+        # timestamps = []
+        # app.logger.info(a.iloc[-1]['timestamp'])
         for id in unique_ids:
             lons.append(a.loc[a['id']==id, 'lon'].iloc[-1])
             lats.append(a.loc[a['id']==id, 'lat'].iloc[-1])
@@ -271,7 +271,7 @@ def get_fig(start, end):
     for i in range(len(fig.data)):
         step = dict(
             method="update",
-            label="{}".format(i),
+            label="{}".format(str(a.iloc[i*stepsize]['timestamp'])[:19]),
             args=[{"visible": [False] * len(fig.data)},
                   {"title": "Slider switched to step: " + str(i)}],  # layout attribute
         )
@@ -280,7 +280,7 @@ def get_fig(start, end):
     sliders = [dict(
         active=0,
         currentvalue={"prefix": "Timestep: "},
-        pad={"t": 50, "b": 50, "l": 15, "r": 15},
+        pad={"t": 50, "b": 50, "l": 40, "r": 40},
         steps=steps
     )]
     fig.update_layout(
