@@ -260,6 +260,7 @@ def get_fig(start, end):
     # center = find_center()
     fig.update_layout(
         margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
+         height=700,
         mapbox={
             'center': center,
             'style': "stamen-terrain",
