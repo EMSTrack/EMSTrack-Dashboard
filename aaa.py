@@ -195,6 +195,8 @@ def get_fig(start, end):
         # app.logger.info(df)
         # print(data)
         vehicles[id] = {'ambulance': ambulance, 'data': data}
+        
+    
     df = df.apply(splitlotlan, axis=1).dropna()
     data = df
     data['timestamp'] = pd.to_datetime(data.timestamp)
@@ -220,11 +222,16 @@ def get_fig(start, end):
         colors = []
         texts = []
         timestamps = []
+     
+            
+            
+            
         for id in unique_ids:
             lons.append(a.loc[a['id']==id, 'lon'].iloc[-1])
             lats.append(a.loc[a['id']==id, 'lat'].iloc[-1])
             texts.append(a.loc[a['id']==id, 'identifier'].iloc[-1] + " {}".format(a.loc[a['id']==id, 'timestamp'].iloc[-1]))
-            colors.append(color_map[id])
+            # colors.append(color_map[id])
+            colors.append(        dict_ambulances[id]["ambulance_color"] )
         fig.add_trace(
             go.Scattermapbox(
                 visible=False,
@@ -296,21 +303,7 @@ ALLOWED_TYPES = (
 )
 def get_random_color(pastel_factor=0.5):
     return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0, 1.0) for i in [1, 2, 3]]]
-def color_distance(c1, c2):
-    return sum([abs(x[0]-x[1]) for x in zip(c1, c2)])
-def generateo_new_color(existing_colors, pastel_factor=0.5):
-    max_distance = None
-    best_color = None
-    for i in range(0, 100):
-        color = get_random_color(pastel_factor=pastel_factor)
-        if not existing_colors:
-            return color
-        best_distance = min([color_distance(color, c)
-                             for c in existing_colors])
-        if not max_distance or best_distance > max_distance:
-            max_distance = best_distance
-            best_color = color
-    return best_color
+
 def generate_new_color():
     def rand(): return random.randint(100, 255)
     return '#%02X%02X%02X' % (rand(), rand(), rand())
