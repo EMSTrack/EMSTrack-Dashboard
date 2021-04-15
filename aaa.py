@@ -71,6 +71,7 @@ s_button = {
     'background-color': main_colors['main-blue'],
     'border-color': '#343a40',
 }
+# isMapEmpty = True
 def get(url, params=None, extend=True):
     global base_url, token
     set_token()
@@ -175,7 +176,10 @@ def find_center():
     center['lon'] = mean_long
     center['lat'] = mean_lat
     return center
+
+
 def get_fig(start, end):
+    # isMapEmpty = False
     ambulances = get_ambulances()
     ids = [ambulance['id'] for ambulance in ambulances]
     init_dict_ambulances(start, end)
@@ -187,6 +191,10 @@ def get_fig(start, end):
         # data = get(f'ambulance/{id}/updates/').json()#'?filter=2019-10-01T15:00:00.000Z,2020-10-30T15:00:00.000Z').json()
         data = get(
             f'ambulance/{id}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
+        # app.logger.info(len(data))
+        # if len(data) == 0:
+        #     isMapEmpty = True
+            # return
         data = [{'id': id, 'identifier': ambulance['identifier'], **item}
                 for item in data]
         # if len(data) != 0:
@@ -239,7 +247,7 @@ def get_fig(start, end):
                 lon=lons,
                 lat=lats,
                 text=texts,
-                marker=go.scattermapbox.Marker(symbol='circle', color=colors, size=14),
+                marker=go.scattermapbox.Marker(symbol='circle', color=colors, size=20),
             )
         )
         #  marker = {'size': 20, 'symbol':   "airport", 'color':dict_ambulances[id]['ambulance_color'] },
@@ -280,7 +288,7 @@ def get_fig(start, end):
         steps.append(step)
     sliders = [dict(
         active=0,
-        currentvalue={"prefix": "Timestep: "},
+        currentvalue={"prefix": "Timestamp: "},
         pad={"t": 25, "b": -10, "l": 40, "r": 40},
         steps=steps
     )]
@@ -316,7 +324,7 @@ def generate_ambulance_card(ambulance_id):
         dbc.CardBody(
             [
                 html.H4(single_ambulance["name"],
-                        className="card-title"),
+                        className="card-title text-center"),
                 html.Div([
                         #  html.P(
                         #      str(single_ambulance["dict_calls"]),
@@ -363,7 +371,7 @@ app.layout = html.Div(children=[
                 ]),
                 dbc.Button("Generate", id='generate',
                            className="mr-2",  style=s_button),
-                dbc.Button("Reset", className="mr-2", style=s_button),
+                dbc.Button("Reset", id='reset', className="mr-2", style=s_button),
                 dbc.Button("Export", className="mr-2 ", style=s_button),
             ],
             align="center", justify="center", className="mb-5", style={'color': main_colors['main-blue']}
@@ -401,29 +409,26 @@ def update_col(prop):
     # hm = generate_ambulance_card(list(dict_ambulances.keys())[0])
     # app.logger.info(hrm)
     return hrm
+
 @app.callback(
     dash.dependencies.Output('map-graph', 'figure'),
     [dash.dependencies.Input('my-date-picker-range', 'start_date'),
      dash.dependencies.Input('my-date-picker-range', 'end_date'),
-     dash.dependencies.Input('generate', 'n_clicks')])
-def update_output(start_date, end_date, n_clicks):
-    string_prefix = 'You have selected: '
-    if start_date is not None:
-        start_date_object = date.fromisoformat(start_date)
-        start_date_string = start_date_object.strftime('%B %d, %Y')
-        string_prefix = string_prefix + 'Start Date: ' + start_date_string + ' | '
-    if end_date is not None:
-        end_date_object = date.fromisoformat(end_date)
-        end_date_string = end_date_object.strftime('%B %d, %Y')
-        string_prefix = string_prefix + 'End Date: ' + end_date_string
-    if n_clicks is not None:
-        # init_dict_ambulances(start_date, end_date)
-        # app.logger.info(dict_ambulances)
-        return get_fig(start_date, end_date)
+     dash.dependencies.Input('generate', 'n_clicks'),
+     dash.dependencies.Input('reset', 'n_clicks')])
+def update_output(start_date, end_date, generate, reset):
+    ctx = dash.callback_context
+    button_id = ''
+    generate_n_clicks = False
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        generate_n_clicks = True
+    if button_id == 'generate' and generate_n_clicks:
+        ret_fig = get_fig(start_date, end_date)
+        if True:
+            # app.logger.info('HERE')
+            return ret_fig
     return get_fig(date(2019, 10, 1), date(2020, 10, 30))
-    # if len(string_prefix) == len('You have selected: '):
-    #     return 'Select a date to see it displayed here'
-    # else:
-    #     return string_prefix
+
 if __name__ == '__main__':
     app.run_server(debug=True)
