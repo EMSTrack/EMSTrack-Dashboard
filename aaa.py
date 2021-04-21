@@ -46,10 +46,10 @@ color_green = {
     # 'background-color': main_colors['medium-green'],
 }
 s_card_box ={
-    "maxHeight": "150px", 
+    "maxHeight": "150px",
     "overflow": "auto",
     "font-size":" 9px",
-    
+
 }
 s_button = {
     'margin-left': '15px',
@@ -178,7 +178,7 @@ def find_center():
     return center
 
 
-def get_fig(start, end):
+def get_fig(start, end, show_trace=False):
     # isMapEmpty = False
     ambulances = get_ambulances()
     ids = [ambulance['id'] for ambulance in ambulances]
@@ -203,8 +203,8 @@ def get_fig(start, end):
         # app.logger.info(df)
         # print(data)
         vehicles[id] = {'ambulance': ambulance, 'data': data}
-        
-    
+
+
     df = df.apply(splitlotlan, axis=1).dropna()
     data = df
     data['timestamp'] = pd.to_datetime(data.timestamp)
@@ -239,7 +239,7 @@ def get_fig(start, end):
             lats.append(a.loc[a['id']==id, 'lat'].iloc[-1])
             texts.append(a.loc[a['id']==id, 'identifier'].iloc[-1] + " {}".format(a.loc[a['id']==id, 'timestamp'].iloc[-1]))
             # colors.append(color_map[id])
-            colors.append(        dict_ambulances[id]["ambulance_color"] )
+            colors.append(dict_ambulances[id]["ambulance_color"])
         fig.add_trace(
             go.Scattermapbox(
                 visible=False,
@@ -247,6 +247,7 @@ def get_fig(start, end):
                 lon=lons,
                 lat=lats,
                 text=texts,
+                showlegend=False,
                 marker=go.scattermapbox.Marker(symbol='circle', color=colors, size=20),
             )
         )
@@ -284,7 +285,11 @@ def get_fig(start, end):
             args=[{"visible": [False] * len(fig.data)},
                   {"title": "Slider switched to step: " + str(i)}],  # layout attribute
         )
-        step["args"][0]["visible"][i] = True  # Toggle i'th trace to "visible"
+        if show_trace:
+            for j in range(i+1):
+                step["args"][0]["visible"][j] = True  # Toggle i'th trace to "visible"
+        else:
+            step["args"][0]["visible"][i] = True
         steps.append(step)
     sliders = [dict(
         active=0,
@@ -295,8 +300,8 @@ def get_fig(start, end):
     fig.update_layout(
         sliders=sliders
     )
-    
-    
+
+
     # fig.show()
     # fig.write_html("plotly.html")
     return fig
@@ -382,7 +387,7 @@ app.layout = html.Div(children=[
                     id='map-graph',
                     figure=get_fig(date(2019, 10, 1), date(2020, 10, 30))
                 ),
-            ],  
+            ],
             # align="center", justify="center", style=color_green
         ),
         dbc.Row(
