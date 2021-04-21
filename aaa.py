@@ -180,6 +180,7 @@ def find_center():
 
 def get_fig(start, end):
     # isMapEmpty = False
+    # app.logger.info("AGGGGGGGGGGGGHHHHHHHHHH")
     ambulances = get_ambulances()
     ids = [ambulance['id'] for ambulance in ambulances]
     init_dict_ambulances(start, end)
@@ -192,9 +193,6 @@ def get_fig(start, end):
         data = get(
             f'ambulance/{id}/updates/?filter={start}T15:00:00.000Z,{end}T15:00:00.000Z').json()
         # app.logger.info(len(data))
-        # if len(data) == 0:
-        #     isMapEmpty = True
-            # return
         data = [{'id': id, 'identifier': ambulance['identifier'], **item}
                 for item in data]
         # if len(data) != 0:
@@ -207,6 +205,9 @@ def get_fig(start, end):
     
     df = df.apply(splitlotlan, axis=1).dropna()
     data = df
+    # app.logger.info(data)
+    if data.empty:
+        return None
     data['timestamp'] = pd.to_datetime(data.timestamp)
     data = data.sort_values(by='timestamp', ascending=True).reset_index()
     center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
@@ -243,7 +244,7 @@ def get_fig(start, end):
         fig.add_trace(
             go.Scattermapbox(
                 visible=False,
-                mode="markers",
+                mode="markers+text+lines",
                 lon=lons,
                 lat=lats,
                 text=texts,
@@ -268,7 +269,7 @@ def get_fig(start, end):
     # center = find_center()
     fig.update_layout(
         margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
-         height=700,
+        height=700,
         mapbox={
             'center': center,
             'style': "stamen-terrain",
@@ -424,10 +425,12 @@ def update_output(start_date, end_date, generate, reset):
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
         generate_n_clicks = True
     if button_id == 'generate' and generate_n_clicks:
+        app.logger.info('HERE2')
         ret_fig = get_fig(start_date, end_date)
-        if True:
+        if ret_fig is not None:
             # app.logger.info('HERE')
             return ret_fig
+    app.logger.info('HERE3')
     return get_fig(date(2019, 10, 1), date(2020, 10, 30))
 
 if __name__ == '__main__':
