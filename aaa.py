@@ -433,14 +433,15 @@ def update_output(start_date, end_date, generate_d, generate_s, reset):
     if ctx.triggered:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
         generate_n_clicks = True
-    if button_id == 'generate_s' and generate_n_clicks:
-        ret_fig = get_fig(start_date, end_date, False)
-        if ret_fig is not None:
-            return ret_fig
-    elif button_id == 'generate_d' and generate_n_clicks:
-        ret_fig = get_fig(start_date, end_date, True)
-        if ret_fig is not None:
-            return ret_fig
+    if start_date is not None or end_date is not None:
+        if button_id == 'generate_s' and generate_n_clicks:
+            ret_fig = get_fig(start_date, end_date, False)
+            if ret_fig is not None:
+                return ret_fig
+        elif button_id == 'generate_d' and generate_n_clicks:
+            ret_fig = get_fig(start_date, end_date, True)
+            if ret_fig is not None:
+                return ret_fig
     return get_fig(date(2019, 10, 1), date(2020, 10, 30))
 
 if __name__ == '__main__':
