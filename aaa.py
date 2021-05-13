@@ -23,6 +23,7 @@ from datetime import date
 from datetime import datetime as dt
 import re
 from haversine import haversine, Unit
+from dash.exceptions import PreventUpdate
 # --- CSS FORMATTING
 main_colors = {
     'main-blue': '#343a40',
@@ -119,7 +120,9 @@ def splitlotlan(row):
     return row
 dict_ambulances = {}
 def init_dict_ambulances(start, end):
-    ambulances = get_ambulances()
+    dict_ambulances = {}
+    # ambulances = get_ambulances()
+    app.logger.info("DICTAMB")
     for amb in ambulances:
         if amb["id"] not in dict_ambulances.keys():
             color_sample = generate_new_color()
@@ -132,6 +135,9 @@ def init_dict_ambulances(start, end):
             # insert at beginning, since api call gives us positions from newest to oldest
             dict_ambulances[amb["id"]]["dict_calls"].insert(
                 0, {"location": d["location"], "timestamp": d["timestamp"]})
+    
+    return
+    # app.logger.info(f"initial: {dict_ambulances}")
 def get_ambulances():
     global cfg
     global base_url
@@ -180,9 +186,9 @@ def days_between(d1, d2):
     return abs((d2 - d1).days)
 
 def get_fig(start, end, show_slider=False):
-    ambulances = get_ambulances()
     ids = [ambulance['id'] for ambulance in ambulances]
     init_dict_ambulances(start, end)
+    # init_dict_ambulances()
     vehicles = {}
     df = pd.DataFrame()
     for ambulance in ambulances:
@@ -196,12 +202,14 @@ def get_fig(start, end, show_slider=False):
 
     df = df.apply(splitlotlan, axis=1).dropna()
     data = df
+    # app.logger.info(data.shape) # data is good
     if data.empty:
         return None
     data['timestamp'] = pd.to_datetime(data.timestamp)
     data = data.sort_values(by='timestamp', ascending=True).reset_index()
     center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
     fig = go.Figure()
+    # app.logger.info("initial fig {}".format(len(fig.data)))
 
     for id in dict_ambulances.keys():
         lons = []
@@ -251,15 +259,17 @@ def get_fig(start, end, show_slider=False):
                 lons.append(call['location']['longitude'])
                 lats.append(call['location']['latitude'])
                 times.append(call['timestamp'])
-    fig.update_layout(
-        margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
-        height=700,
-        mapbox={
-            'center': center,
-            'style': "dark",
-            'accesstoken': 'pk.eyJ1IjoiZ29rdWxhciIsImEiOiJja25zM3Q0Y2IwMnM2Mm90aDRpOGg3OGxoIn0.puvyGlK6lGk_LkJKFBgfDw',
-            'zoom': 8}
-    )
+    # fig.update_layout(
+    #     margin={'l': 0, 't': 0, 'b': 0, 'r': 0},
+    #     height=700,
+    #     mapbox={
+    #         'center': center,
+    #         'style': "dark",
+    #         'accesstoken': 'pk.eyJ1IjoiZ29rdWxhciIsImEiOiJja25zM3Q0Y2IwMnM2Mm90aDRpOGg3OGxoIn0.puvyGlK6lGk_LkJKFBgfDw',
+    #         'zoom': 8}
+    # )
+
+    app.logger.info(f"dictamb fig: {len(fig.data)}")
 
     line_size = len(fig.data)
 
@@ -270,6 +280,7 @@ def get_fig(start, end, show_slider=False):
         a = data.loc[:step:1]
         amb_name = a['id']
         unique_ids = a.id.unique()
+        # app.logger.info(unique_ids)
         lons = []
         lats = []
         colors = []
@@ -327,7 +338,8 @@ def get_fig(start, end, show_slider=False):
     fig.update_layout(
         sliders=sliders
     )
-
+    app.logger.info(len(fig.data))
+    # dict_ambulances = {}
     return fig
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 # external_stylesheets = [
@@ -374,6 +386,8 @@ def generate_ambulance_card(ambulance_id):
 # app = dash.Dash(external_stylesheets=[])
 #  html.Div(className = "container-sm", children = [
 #     ]),
+ambulances = get_ambulances()
+
 app.layout = html.Div(children=[
     html.Div(className="container-fluid",  style=main_container, children=[
         html.H1(children='Mileage Report', className="mb-4"),
@@ -446,22 +460,30 @@ app.layout = html.Div(children=[
      dash.dependencies.Input('generate_d', 'n_clicks'),
      dash.dependencies.Input('reset', 'n_clicks')])
 def update_output(start_date, end_date, generate_d, reset):
+    # print(app.layout)
     ctx = dash.callback_context
     button_id = ''
     generate_n_clicks = False
+    print("entering update output function")
     if ctx.triggered:
+        print("context triggered")
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
         generate_n_clicks = True
+    else:
+        print("context not triggered")
+        raise PreventUpdate
     if start_date is not None and end_date is not None:
+        print("entering new fig generation")
         # if button_id == 'generate_s' and generate_n_clicks:
         #     ret_fig = get_fig(start_date, end_date, False)
         #     if ret_fig is not None:
         #         return ret_fig
         if button_id == 'generate_d' and generate_n_clicks:
             ret_fig = get_fig(start_date, end_date, True)
+            app.logger.info(len(ret_fig.data))
             if ret_fig is not None:
                 return ret_fig
     return get_fig(date(2019, 10, 1), date(2020, 10, 30))
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=8051)
