@@ -470,21 +470,35 @@ app.layout = html.Div(children=[
             ],
             align="center", justify="center", className="mb-5", style={'color': main_colors['main-blue']}
         ),
-        html.Div(
-            [
-                dcc.Graph(
-                    id='map-graph',
-                    className="mx-0",
-                    figure=get_fig(date(2019, 10, 1), date.today())
+        dcc.Loading(
+            id="loading-2",
+            children=[html.Div(
+                    [
+                        dcc.Graph(
+                            id='map-graph',
+                            className="mx-0",
+                            figure=get_fig(date(2019, 10, 1), date.today())
+                        ),
+                    ],
                 ),
-                # dcc.Loading(
-                #     id="loading-2",
-                #     children=[html.Div([html.Div(id="loading-output-2")])],
-                #     type="circle",
-                # ),
             ],
-            # align="center", justify="center", style=color_green
+            type="circle",
         ),
+        # html.Div(
+        #     [
+        #         dcc.Graph(
+        #             id='map-graph',
+        #             className="mx-0",
+        #             figure=get_fig(date(2019, 10, 1), date.today())
+        #         ),
+        #         # dcc.Loading(
+        #         #     id="loading-2",
+        #         #     children=[html.Div([html.Div(id="loading-output-2")])],
+        #         #     type="circle",
+        #         # ),
+        #     ],
+        #     # align="center", justify="center", style=color_green
+        # ),
         # dbc.Row(
         #     [
         #         dbc.Col([
