@@ -1,2 +1,69 @@
-DICTAMB
-dictamb fig: 0
+Dash is running on http://127.0.0.1:8051/
+
+ * Serving Flask app "aaa" (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: on
+entering update output function
+context not triggered
+entering update output function
+context not triggered
+entering update output function
+context not triggered
+entering update output function
+context not triggered
+entering update output function
+context not triggered
+entering update output function
+context not triggered
+entering update output function
+context not triggered
+entering update output function
+context triggered
+my-date-picker-range
+entering new fig generation
+entering update output function
+context triggered
+generate_d
+entering new fig generation
+entering update output function
+context triggered
+reset
+entering update output function
+context not triggered
+entering update output function
+context triggered
+my-date-picker-range
+entering new fig generation
+entering new fig generation
+entering update output function
+context triggered
+generate_d
+entering new fig generation
+entering new fig generation
+entering update output function
+context triggered
+reset
+entering update output function
+context triggered
+reset
+entering update output function
+context not triggered
+my-date-picker-range
+generate_d
+reset
+reset
+reset
+reset
+my-date-picker-range
+generate_d
+reset
+reset
+my-date-picker-range
+my-date-picker-range
+generate_d
+reset
+reset
+my-date-picker-range
+generate_d

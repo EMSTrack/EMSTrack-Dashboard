@@ -74,6 +74,7 @@ s_button = {
     'background-color': main_colors['main-blue'],
     'border-color': '#343a40',
 }
+generate_n_clicks = False
 def get(url, params=None, extend=True):
     global base_url, token
     set_token()
@@ -118,11 +119,11 @@ def splitlotlan(row):
     if row['lat'] == 37.4219983 and row['lon'] == -122.084:
         return None
     return row
-dict_ambulances = {}
+# dict_ambulances = {}
 def init_dict_ambulances(start, end):
     dict_ambulances = {}
     # ambulances = get_ambulances()
-    app.logger.info("DICTAMB")
+    # app.logger.info("DICTAMB")
     for amb in ambulances:
         if amb["id"] not in dict_ambulances.keys():
             color_sample = generate_new_color()
@@ -135,8 +136,9 @@ def init_dict_ambulances(start, end):
             # insert at beginning, since api call gives us positions from newest to oldest
             dict_ambulances[amb["id"]]["dict_calls"].insert(
                 0, {"location": d["location"], "timestamp": d["timestamp"]})
+    # app.logger.info(dict_ambulances)
     
-    return
+    return dict_ambulances
     # app.logger.info(f"initial: {dict_ambulances}")
 def get_ambulances():
     global cfg
@@ -162,23 +164,23 @@ def get_ambulance_colors(ambulances):
             else:
                 i = 0
     return color_map
-def find_center():
-    center = {'lon': 0, 'lat': 0}
-    total_sum_long = 0
-    total_sum_lat = 0
-    total_calls_long = 0
-    total_calls_lat = 0
-    for id in dict_ambulances.keys():
-        for call in dict_ambulances[id]['dict_calls']:
-            total_sum_long += call['location']['longitude']
-            total_sum_lat += call['location']['latitude']
-            total_calls_long += 1
-            total_calls_lat += 1
-    mean_long = total_sum_long/total_calls_long
-    mean_lat = total_sum_lat/total_calls_lat
-    center['lon'] = mean_long
-    center['lat'] = mean_lat
-    return center
+# def find_center():
+#     center = {'lon': 0, 'lat': 0}
+#     total_sum_long = 0
+#     total_sum_lat = 0
+#     total_calls_long = 0
+#     total_calls_lat = 0
+#     for id in dict_ambulances.keys():
+#         for call in dict_ambulances[id]['dict_calls']:
+#             total_sum_long += call['location']['longitude']
+#             total_sum_lat += call['location']['latitude']
+#             total_calls_long += 1
+#             total_calls_lat += 1
+#     mean_long = total_sum_long/total_calls_long
+#     mean_lat = total_sum_lat/total_calls_lat
+#     center['lon'] = mean_long
+#     center['lat'] = mean_lat
+#     return center
 
 def days_between(d1, d2):
     d1 = dt.strptime(d1, "%Y-%m-%dT%H:%M:%S")
@@ -186,8 +188,10 @@ def days_between(d1, d2):
     return abs((d2 - d1).days)
 
 def get_fig(start, end, show_slider=False):
+    # app.logger.info(dict_ambulances)
     ids = [ambulance['id'] for ambulance in ambulances]
-    init_dict_ambulances(start, end)
+    dict_ambulances = init_dict_ambulances(start, end)
+    # app.logger.info(dict_ambulances)
     # init_dict_ambulances()
     vehicles = {}
     df = pd.DataFrame()
@@ -204,7 +208,27 @@ def get_fig(start, end, show_slider=False):
     data = df
     # app.logger.info(data.shape) # data is good
     if data.empty:
-        return None
+        return {
+            "layout": {
+                "xaxis": {
+                    "visible": False
+                },
+                "yaxis": {
+                    "visible": False
+                },
+                "annotations": [
+                    {
+                        "text": "No matching data found",
+                        "xref": "paper",
+                        "yref": "paper",
+                        "showarrow": False,
+                        "font": {
+                            "size": 28
+                        }
+                    }
+                ]
+            }
+        }
     data['timestamp'] = pd.to_datetime(data.timestamp)
     data = data.sort_values(by='timestamp', ascending=True).reset_index()
     center = {'lon': data['lon'].mean(), 'lat': data['lat'].mean()}
@@ -236,6 +260,7 @@ def get_fig(start, end, show_slider=False):
                         lat=lats,
                         text=times,
                         name=dict_ambulances[id]['name'],
+                        legendgroup=str(id),
                         showlegend=True,
                         marker=go.scattermapbox.Marker(symbol='circle', color=dict_ambulances[id]['ambulance_color'], size=20),
                     )
@@ -249,7 +274,8 @@ def get_fig(start, end, show_slider=False):
                         lat=lats,
                         text=times,
                         name=dict_ambulances[id]['name'],
-                        showlegend=True,
+                        legendgroup=str(id),
+                        showlegend=False,
                         marker=go.scattermapbox.Marker(symbol='circle', color=dict_ambulances[id]['ambulance_color'], size=20),
                     )
                 )
@@ -269,7 +295,7 @@ def get_fig(start, end, show_slider=False):
     #         'zoom': 8}
     # )
 
-    app.logger.info(f"dictamb fig: {len(fig.data)}")
+    # app.logger.info(f"dictamb fig: {len(fig.data)}")
 
     line_size = len(fig.data)
 
@@ -281,21 +307,37 @@ def get_fig(start, end, show_slider=False):
         amb_name = a['id']
         unique_ids = a.id.unique()
         # app.logger.info(unique_ids)
-        lons = []
-        lats = []
-        colors = []
-        texts = []
-        names = []
+        # names = []
         # timestamps = []
-        # app.logger.info(a.iloc[-1]['timestamp'])
+        # app.logger.info(dict_ambulances)
+        curr_trace = []
         for id in unique_ids:
-            lons.append(a.loc[a['id']==id, 'lon'].iloc[-1])
-            lats.append(a.loc[a['id']==id, 'lat'].iloc[-1])
-            texts.append(a.loc[a['id']==id, 'identifier'].iloc[-1] + " {}".format(a.loc[a['id']==id, 'timestamp'].iloc[-1]))
-            # texts.append(a.loc[a['id']==id, 'timestamp'].iloc[-1])
-            # names.append(a.loc[a['id']==id, 'identifier'].iloc[-1]) 
-            # colors.append(color_map[id])
-            colors.append(dict_ambulances[id]["ambulance_color"])
+            # lons.append(a.loc[a['id']==id, 'lon'].iloc[-1])
+            # lats.append(a.loc[a['id']==id, 'lat'].iloc[-1])
+            # texts.append(a.loc[a['id']==id, 'identifier'].iloc[-1] + " {}".format(a.loc[a['id']==id, 'timestamp'].iloc[-1]))
+            # # texts.append(a.loc[a['id']==id, 'timestamp'].iloc[-1])
+            # # names.append(a.loc[a['id']==id, 'identifier'].iloc[-1]) 
+            # # colors.append(color_map[id])
+            # colors.append(dict_ambulances[id]["ambulance_color"])
+            curr_trace.append(a.loc[a['id']==id].iloc[-1])
+        curr_trace_df = pd.DataFrame(curr_trace)
+        curr_trace_df = curr_trace_df.sort_values(by='timestamp', ascending=False).reset_index()
+        latest_time = curr_trace_df['timestamp'].iloc[0]
+        lons = [curr_trace_df['lon'].iloc[0]]
+        lats = [curr_trace_df['lat'].iloc[0]]
+        texts = [curr_trace_df['identifier'].iloc[0] + " {}".format(curr_trace_df['timestamp'].iloc[0])]
+        colors = [dict_ambulances[curr_trace_df['id'].iloc[0]]["ambulance_color"]]
+        for i in range(1, len(list(curr_trace_df['timestamp']))):
+            if days_between(str(curr_trace_df['timestamp'].iloc[i])[:10] + "T" + 
+                            str(curr_trace_df['timestamp'].iloc[i])[11:19], 
+                            str(latest_time)[:10] + "T" + str(latest_time)[11:19]) < 2:
+                lons.append(curr_trace_df['lon'].iloc[i])
+                lats.append(curr_trace_df['lat'].iloc[i])
+                texts.append(curr_trace_df['identifier'].iloc[i] + " {}".format(curr_trace_df['timestamp'].iloc[i]))
+                colors.append(dict_ambulances[curr_trace_df['id'].iloc[i]]["ambulance_color"])
+
+        # app.logger.info(curr_trace_df['timestamp'])
+
         fig.add_trace(
             go.Scattermapbox(
                 visible=False,
@@ -303,7 +345,9 @@ def get_fig(start, end, show_slider=False):
                 lon=lons,
                 lat=lats,
                 text=texts,
-                showlegend=False,
+                legendgroup="points",
+                name="Points",
+                showlegend=True,
                 marker=go.scattermapbox.Marker(symbol='circle', color=colors, size=20),
             )
         )
@@ -338,8 +382,14 @@ def get_fig(start, end, show_slider=False):
     fig.update_layout(
         sliders=sliders
     )
-    app.logger.info(len(fig.data))
+    # app.logger.info(len(fig.data))
     # dict_ambulances = {}
+    fig.update_layout(legend=dict(
+        # yanchor="top",
+        y=0.95,
+        # xanchor="left",
+        # x=0.01
+    ))
     return fig
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 # external_stylesheets = [
@@ -357,28 +407,28 @@ def get_random_color(pastel_factor=0.5):
 def generate_new_color():
     def rand(): return random.randint(100, 255)
     return '#%02X%02X%02X' % (rand(), rand(), rand())
-def generate_ambulance_card(ambulance_id):
-    single_ambulance = dict_ambulances[ambulance_id]
-    return dbc.Card([
-        dbc.CardBody(
-            [
-                html.H4(single_ambulance["name"],
-                        className="card-title text-center"),
-                html.Div([
-                        #  html.P(
-                        #      str(single_ambulance["dict_calls"]),
-                        #      className="card-text", style={}
-                        #  ),
-                         ], style = s_card_box)
-                # dbc.Button(
-                #     "Go", color="primary", className="mt-3"),
-            ]
-        ),
-    ],
-        className="m-3",
-        # color = color_sample,
-        style={"backgroundColor": single_ambulance["ambulance_color"]},
-    )
+# def generate_ambulance_card(ambulance_id):
+#     single_ambulance = dict_ambulances[ambulance_id]
+#     return dbc.Card([
+#         dbc.CardBody(
+#             [
+#                 html.H4(single_ambulance["name"],
+#                         className="card-title text-center"),
+#                 html.Div([
+#                         #  html.P(
+#                         #      str(single_ambulance["dict_calls"]),
+#                         #      className="card-text", style={}
+#                         #  ),
+#                          ], style = s_card_box)
+#                 # dbc.Button(
+#                 #     "Go", color="primary", className="mt-3"),
+#             ]
+#         ),
+#     ],
+#         className="m-3",
+#         # color = color_sample,
+#         style={"backgroundColor": single_ambulance["ambulance_color"]},
+#     )
     # return dbc.Button(children=str(team_shortName),
     #                   color="primary",
     #                   className="mr-1",
@@ -406,6 +456,7 @@ app.layout = html.Div(children=[
                         min_date_allowed=date(1995, 8, 5),
                         max_date_allowed=date.today() + datetime.timedelta(days=1),
                         initial_visible_month=date.today(),
+                        start_date=date(2019, 10, 1),
                         end_date=date.today()
                     ),
                     html.Div(id='output-container-date-picker-range')
@@ -424,8 +475,13 @@ app.layout = html.Div(children=[
                 dcc.Graph(
                     id='map-graph',
                     className="mx-0",
-                    figure=get_fig(date(2019, 10, 1), date(2020, 10, 30))
+                    figure=get_fig(date(2019, 10, 1), date.today())
                 ),
+                # dcc.Loading(
+                #     id="loading-2",
+                #     children=[html.Div([html.Div(id="loading-output-2")])],
+                #     type="circle",
+                # ),
             ],
             # align="center", justify="center", style=color_green
         ),
@@ -464,26 +520,47 @@ def update_output(start_date, end_date, generate_d, reset):
     ctx = dash.callback_context
     button_id = ''
     generate_n_clicks = False
-    print("entering update output function")
     if ctx.triggered:
-        print("context triggered")
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-        generate_n_clicks = True
+        app.logger.info(button_id)
+        if button_id == "generate_d":
+            generate_n_clicks = True
+        elif button_id == "reset":
+            return get_fig(date(2019, 10, 1), date.today())
+            # return app.layout
     else:
-        print("context not triggered")
+        raise PreventUpdate
+    if start_date is None or end_date is None:
         raise PreventUpdate
     if start_date is not None and end_date is not None:
-        print("entering new fig generation")
         # if button_id == 'generate_s' and generate_n_clicks:
         #     ret_fig = get_fig(start_date, end_date, False)
         #     if ret_fig is not None:
         #         return ret_fig
         if button_id == 'generate_d' and generate_n_clicks:
+            generate_n_clicks = False
             ret_fig = get_fig(start_date, end_date, True)
-            app.logger.info(len(ret_fig.data))
+            # app.logger.info(len(ret_fig.data))
             if ret_fig is not None:
                 return ret_fig
-    return get_fig(date(2019, 10, 1), date(2020, 10, 30))
+    raise PreventUpdate
+
+@app.callback(
+    dash.dependencies.Output('my-date-picker-range', 'start_date'),
+    dash.dependencies.Output('my-date-picker-range', 'end_date'),
+    [dash.dependencies.Input('reset', 'n_clicks')])
+def update_start_date(reset):
+    # print(app.layout)
+    ctx = dash.callback_context
+    button_id = ''
+    generate_n_clicks = False
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        app.logger.info(button_id)
+        if button_id == "reset":
+            return date(2019, 10, 1), date.today()
+    else:
+        raise PreventUpdate
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=8051)
