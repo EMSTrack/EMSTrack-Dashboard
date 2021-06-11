@@ -1,5 +1,5 @@
 # EMSTrack-Dashboard
-A web application to keep track of ambulance routes.
+A web application to keep track of ambulance routes. Remember to get the config.yml file and add it to the root of the directory.
 
 ## To Run Locally:
 1. Install Python
