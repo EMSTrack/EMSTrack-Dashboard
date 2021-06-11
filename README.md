@@ -11,7 +11,7 @@ pip install -r requirements.txt
 ```
 python index.py
 ```
-4. Go to http://localhost:8050
+4. Go to http://127.0.0.1:8050
 
 ## To Run with Docker:
 1. Install Docker
@@ -19,7 +19,8 @@ python index.py
 ```
 docker build -t dash .
 ```
-4. Run Image:
+3. Run Image:
 ```
 docker run -p 8000:8000 dash
 ```
+4. Go to http://localhost:8000
