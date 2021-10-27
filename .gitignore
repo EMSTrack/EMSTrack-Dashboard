@@ -5,6 +5,7 @@
 *.yml
 .bash_profile
 .DS_Store
+local.env
 
 ### JupyterNotebooks ###
 # gitignore template for Jupyter Notebooks
