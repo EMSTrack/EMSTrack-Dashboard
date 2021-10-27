@@ -3,6 +3,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=jupyternotebooks,python
 
 *.yml
+.bash_profile
+.DS_Store
 
 ### JupyterNotebooks ###
 # gitignore template for Jupyter Notebooks

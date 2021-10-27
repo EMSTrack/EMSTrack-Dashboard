@@ -12,6 +12,7 @@ from datetime import date
 from datetime import datetime as dt
 from haversine import haversine, Unit
 from style import * 
+import os
 
 def get(url, params=None, extend=True):
     """
@@ -136,10 +137,16 @@ def get_ambulances():
     """
     global cfg
     global base_url
-    with open("config.yml", 'r') as ymlfile:
-        cfg = yaml.safe_load(ymlfile)
-    SERVER = 'UCSD'
-    cfg = cfg[SERVER]
+    # with open("config.yml", 'r') as ymlfile:
+    #     cfg = yaml.safe_load(ymlfile)
+    # SERVER = 'UCSD'
+    # cfg = cfg[SERVER]
+    cfg = {
+        "authurl" : os.environ["DASHBOARD_AUTHURL"],
+        "url" : os.environ["DASHBOARD_URL"],
+        "username" : os.environ["DASHBOARD_USERNAME"],
+        "password" : os.environ["DASHBOARD_PASSWORD"],
+    }
     base_url = cfg['url']
     res = get('ambulance')
     ambulances = res.json()
