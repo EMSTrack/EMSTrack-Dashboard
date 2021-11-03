@@ -10,7 +10,7 @@ RUN pip3 install -r requirements.txt
 
 # Copy the rest of the codebase into the image
 COPY . ./
-EXPOSE 8000
+EXPOSE 8080
 
 # Finally, run gunicorn.
-CMD [ "gunicorn", "--workers=4", "--threads=1", "-b 0.0.0.0:8000", "app:server"]
+CMD [ "gunicorn", "--workers=4", "--threads=1", "-b 0.0.0.0:8080", "app:server"]
