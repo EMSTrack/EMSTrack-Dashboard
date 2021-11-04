@@ -23,7 +23,7 @@ external_stylesheets = [dbc.themes.BOOTSTRAP]
 
 # server = Flask(__name__)
 # app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, requests_pathname_prefix='/dashboard/')
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
