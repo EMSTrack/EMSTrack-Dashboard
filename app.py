@@ -20,10 +20,10 @@ generate_n_clicks = False
 # Adds Bootstrap styling to application
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
-# server = Flask(__name__)
+server = Flask(__name__)
 # app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
 app = dash.Dash(__name__, 
-                # server=server, 
+                server=server, 
                 external_stylesheets=external_stylesheets,
                 url_base_pathname="/dashboard/")
 
