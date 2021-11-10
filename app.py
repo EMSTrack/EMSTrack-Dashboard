@@ -26,8 +26,8 @@ app = dash.Dash(__name__,
                 # server=server, 
                 external_stylesheets=external_stylesheets,
                 url_base_pathname='/dashboard/')
-print('Test info')
-print(app.config, flush=True)
+app.logger.info('Test info')
+app.logger.info(app.config)
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
@@ -173,4 +173,4 @@ def update_start_date(reset):
         raise PreventUpdate
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
