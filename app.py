@@ -25,7 +25,7 @@ server = Flask(__name__)
 app = dash.Dash(__name__, 
                 server=server, 
                 external_stylesheets=external_stylesheets,
-                requests_pathname_prefix='/dashboard/')
+                url_base_pathname='/dashboard/')
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
