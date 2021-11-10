@@ -24,7 +24,8 @@ external_stylesheets = [dbc.themes.BOOTSTRAP]
 # app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
 app = dash.Dash(__name__, 
                 # server=server, 
-                external_stylesheets=external_stylesheets,)
+                external_stylesheets=external_stylesheets,
+                url_base_pathname="/dashboard/")
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
