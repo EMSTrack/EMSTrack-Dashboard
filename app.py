@@ -26,6 +26,8 @@ app = dash.Dash(__name__,
                 # server=server, 
                 external_stylesheets=external_stylesheets,
                 url_base_pathname='/dashboard/')
+app.logger.info('Test info')
+app.logger.info(app.config)
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
