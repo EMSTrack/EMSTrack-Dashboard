@@ -27,7 +27,8 @@ app = dash.Dash(__name__,
                 external_stylesheets=external_stylesheets,)
 
 app.config.update({'requests_pathname_prefix': '/dashboard/'})
-
+app.scripts.config.serve_locally = True
+app.css.config.serve_locally = True
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
