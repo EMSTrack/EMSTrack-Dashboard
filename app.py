@@ -25,9 +25,7 @@ external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = dash.Dash(__name__, 
                 # server=server, 
                 external_stylesheets=external_stylesheets,
-                url_base_pathname='/dashboard/')
-app.logger.info('Test info')
-app.logger.info(app.config)
+                url_base_pathname='/dashboard')
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
@@ -173,4 +171,4 @@ def update_start_date(reset):
         raise PreventUpdate
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
