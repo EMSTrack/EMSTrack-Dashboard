@@ -13,4 +13,4 @@ COPY . ./
 EXPOSE 8080
 
 # Finally, run gunicorn.
-CMD [ "gunicorn", "--workers=2", "--threads=1", "-b 0.0.0.0:8080", "app:app"]
+CMD [ "gunicorn", "--workers=2", "--threads=1", "-b 0.0.0.0:8080", "app:app.run_server()"]
