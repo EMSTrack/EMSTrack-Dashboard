@@ -1,8 +1,8 @@
-dash_html_components
-dash
-plotly
-dash_bootstrap_components
-dash_core_components
+dash_html_components==1.1.2
+dash==1.19.0
+plotly==4.14.3
+dash_bootstrap_components==0.12.0
+dash_core_components==1.15.0
 pandas==1.2.3
 requests==2.23.0
 haversine==2.3.0
