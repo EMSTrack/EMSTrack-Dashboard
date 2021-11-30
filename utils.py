@@ -25,7 +25,7 @@ def get(url, params=None, extend=True):
         A json object containing HTTP GET response. 
     """
     global base_url, token
-    set_token()
+    # set_token()
     if extend == True:
         url = base_url + url
     headers = {'Content-Type': 'application/json',
