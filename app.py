@@ -48,6 +48,7 @@ def display_page(href):
     parsed_url = urlparse(href)
     parsed_qs = parse_qs(parsed_url.query)
     token = parsed_qs["token"][0]
+    set_token(token)
     # print("TOKEN: ", token)
     # return html.Div([
     #     html.H3('Token: {}'.format(token))
