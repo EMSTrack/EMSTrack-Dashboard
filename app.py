@@ -52,7 +52,7 @@ def display_page(href):
     # return html.Div([
     #     html.H3('Token: {}'.format(token))
     # ])
-    return [
+    return html.Div([
         html.H1(children='Dashboard', className="mb-4"),
         html.H3(id='button-clicks'),
 
@@ -95,7 +95,7 @@ def display_page(href):
                 type="circle",
             ),
         ])
-    ]
+    ])
 
 
 # @app.callback(Output('page-content', 'children'),

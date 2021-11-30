@@ -24,7 +24,8 @@ def get(url, params=None, extend=True):
     Returns:
         A json object containing HTTP GET response. 
     """
-    global base_url, token
+    global base_url
+    global token
     # set_token()
     if extend == True:
         url = base_url + url
