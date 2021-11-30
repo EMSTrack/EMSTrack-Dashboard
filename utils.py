@@ -140,7 +140,7 @@ def get_ambulances():
     global base_url
     ## with open("config.yml", 'r') as ymlfile:
     ##     cfg = yaml.safe_load(ymlfile)
-    # SERVER = 'UCSD'
+    SERVER = 'UCSD'
     # cfg = cfg[SERVER]
     cfg = {
     #     "authurl" : os.environ["DASHBOARD_AUTHURL_" + SERVER],
