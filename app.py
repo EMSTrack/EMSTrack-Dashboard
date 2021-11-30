@@ -85,10 +85,12 @@ app.layout = html.Div(children=[
               Input('url', 'pathname'))
 def set_api_token(url):
     global token
+    app.logger.info("Setting API Token")
     parsed_url = urlparse(url)
     parsed_qs = parse_qs(parsed_url.query)
     token = parsed_qs["token"]
-    print("TOKEN: ", token)
+    app.logger.info("TOKEN: ", token)
+    # print("TOKEN: ", token)
 
 @app.callback(
     dash.dependencies.Output('map-graph', 'figure'),
@@ -185,4 +187,4 @@ def update_start_date(reset):
         raise PreventUpdate
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
