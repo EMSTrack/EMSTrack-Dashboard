@@ -40,12 +40,12 @@ app.layout = html.Div([
 
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),
-              [dash.dependencies.Input('url', 'pathname')])
-def display_page(pathname):
+              [dash.dependencies.Input('url', 'href')])
+def display_page(href):
     # this is called every page load and every URL change
     # you can update your components with this URL in here
     return html.Div([
-        html.H3('You are on page {}'.format(pathname))
+        html.H3('You are on page {}'.format(href))
     ])
     # return [
     #     html.H1(children='Dashboard', className="mb-4"),
