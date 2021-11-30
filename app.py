@@ -33,7 +33,7 @@ server = app.server
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
-    dcc.Location(id='url'),
+    dcc.Location(id='url', refresh=False),
     html.Div(className="container-fluid",  style=main_container, children=[
         html.H1(children='Dashboard', className="mb-4"),
         html.H3(id='button-clicks'),
@@ -86,6 +86,7 @@ def set_api_token(url):
     parsed_url = urlparse(url)
     parsed_qs = parse_qs(parsed_url.query)
     token = parsed_qs["token"]
+    print("TOKEN: ", token)
     set_token(token)
 
 @app.callback(

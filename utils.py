@@ -136,17 +136,17 @@ def get_ambulances():
     Returns:
         A json object containing all ambulances
     """
-    global cfg
+    # global cfg
     global base_url
-    # with open("config.yml", 'r') as ymlfile:
-    #     cfg = yaml.safe_load(ymlfile)
-    SERVER = 'UCSD'
+    ## with open("config.yml", 'r') as ymlfile:
+    ##     cfg = yaml.safe_load(ymlfile)
+    # SERVER = 'UCSD'
     # cfg = cfg[SERVER]
     cfg = {
-        "authurl" : os.environ["DASHBOARD_AUTHURL_" + SERVER],
+    #     "authurl" : os.environ["DASHBOARD_AUTHURL_" + SERVER],
         "url" : os.environ["DASHBOARD_URL_" + SERVER],
-        "username" : os.environ["DASHBOARD_USERNAME_" + SERVER],
-        "password" : os.environ["DASHBOARD_PASSWORD_" + SERVER],
+    #     "username" : os.environ["DASHBOARD_USERNAME_" + SERVER],
+    #     "password" : os.environ["DASHBOARD_PASSWORD_" + SERVER],
     }
     base_url = cfg['url']
     res = get('ambulance')
