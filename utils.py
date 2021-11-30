@@ -54,27 +54,28 @@ def post(url, params=None, extend=True):
     response.raise_for_status()
     return response
 
-def set_token():
+def set_token(new_token):
     """
     Sets the token for accessing the API of EMSTrack.
     """
     global token
-    global token_timestamp
-    try:
-        token_timestamp
-    except NameError:
-        token_timestamp = 0
-    if token_timestamp == 0:
-        param = {
-            'username': cfg['username'],
-            'password': cfg['password']
-        }
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        url = cfg['authurl']
-        res = requests.post(url, data=param)
-        res.raise_for_status()
-        token_timestamp = time.time()
-        token = res.json()['token']
+    token = new_token
+    # global token_timestamp
+    # try:
+    #     token_timestamp
+    # except NameError:
+    #     token_timestamp = 0
+    # if token_timestamp == 0:
+    #     param = {
+    #         'username': cfg['username'],
+    #         'password': cfg['password']
+    #     }
+    #     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    #     url = cfg['authurl']
+    #     res = requests.post(url, data=param)
+    #     res.raise_for_status()
+    #     token_timestamp = time.time()
+    #     token = res.json()['token']
 
 def splitlotlan(row):
     """

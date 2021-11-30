@@ -11,6 +11,7 @@ from datetime import date
 from dash.exceptions import PreventUpdate
 from style import * 
 from utils import *
+from urllib.parse import urlparse, parse_qs
 
 from flask import Flask
 
@@ -28,8 +29,11 @@ app = dash.Dash(__name__,
                 url_base_pathname="/dashboard/")
 server = app.server
 
+
+
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div(children=[
+    dcc.Location(id='url'),
     html.Div(className="container-fluid",  style=main_container, children=[
         html.H1(children='Dashboard', className="mb-4"),
         html.H3(id='button-clicks'),
@@ -76,6 +80,13 @@ app.layout = html.Div(children=[
     ]),
 ]
 )
+
+@app.callback(dash.dependencies.Input('url', 'href'))
+def set_api_token(url):
+    parsed_url = urlparse(url)
+    parsed_qs = parse_qs(parsed_url.query)
+    token = parsed_qs["token"]
+    set_token(token)
 
 @app.callback(
     dash.dependencies.Output('map-graph', 'figure'),
