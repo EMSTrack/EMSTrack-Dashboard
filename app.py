@@ -81,7 +81,7 @@ app.layout = html.Div(children=[
 ]
 )
 
-@app.callback(dash.dependencies.Input('url', 'href'))
+@app.callback(dash.dependencies.Input('url', 'pathname'))
 def set_api_token(url):
     parsed_url = urlparse(url)
     parsed_qs = parse_qs(parsed_url.query)
