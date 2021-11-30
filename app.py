@@ -21,16 +21,23 @@ generate_n_clicks = False
 # Adds Bootstrap styling to application
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
+# server = Flask(__name__)
+# app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
 app = dash.Dash(__name__, 
+                # server=server, 
                 external_stylesheets=external_stylesheets,
                 url_base_pathname="/dashboard/")
 server = app.server
+
+
 
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(className="container-fluid", id="page-content",  style=main_container),
-])
+]
+)
+
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'href')])
@@ -41,50 +48,54 @@ def display_page(href):
     parsed_url = urlparse(href)
     parsed_qs = parse_qs(parsed_url.query)
     token = parsed_qs["token"]
-    return [
-        html.H1(children='Dashboard', className="mb-4"),
-        html.H3(id='button-clicks'),
+    # print("TOKEN: ", token)
+    return html.Div([
+        html.H3('Token: {}'.format(token))
+    ])
+    # return [
+    #     html.H1(children='Dashboard', className="mb-4"),
+    #     html.H3(id='button-clicks'),
 
-        # Adds all the input fields for the application
-        dbc.Row(
-            [
-                html.Div([
-                    dcc.DatePickerRange(
-                        id='my-date-picker-range',
-                        min_date_allowed=date(1995, 8, 5),
-                        max_date_allowed=date.today() + datetime.timedelta(days=1),
-                        initial_visible_month=date.today(),
-                        start_date=date(2019, 10, 1),
-                        end_date=date.today()
-                    ),
-                    html.Div(id='output-container-date-picker-range')
-                ]),
-                dbc.Button("Generate", id='generate_d',
-                           className="mr-2",  style=s_button),
-                dbc.Button("Reset", id='reset', className="mr-2", style=s_button),
-            ],
-            align="center", justify="center", className="mb-5", style={'color': main_colors['main-blue']}
-        ),
+    #     # Adds all the input fields for the application
+    #     dbc.Row(
+    #         [
+    #             html.Div([
+    #                 dcc.DatePickerRange(
+    #                     id='my-date-picker-range',
+    #                     min_date_allowed=date(1995, 8, 5),
+    #                     max_date_allowed=date.today() + datetime.timedelta(days=1),
+    #                     initial_visible_month=date.today(),
+    #                     start_date=date(2019, 10, 1),
+    #                     end_date=date.today()
+    #                 ),
+    #                 html.Div(id='output-container-date-picker-range')
+    #             ]),
+    #             dbc.Button("Generate", id='generate_d',
+    #                        className="mr-2",  style=s_button),
+    #             dbc.Button("Reset", id='reset', className="mr-2", style=s_button),
+    #         ],
+    #         align="center", justify="center", className="mb-5", style={'color': main_colors['main-blue']}
+    #     ),
 
-        # Adds a loading wrapper for loading animation
-        html.Div(className="loader-wrapper",children=[
-            dcc.Loading(
-                parent_className='loading_wrapper',
-                id="loading-2",
-                children=[html.Div(
-                        [
-                            dcc.Graph(
-                                id='map-graph',
-                                className="mx-0",
-                                figure=get_fig(date(2019, 10, 1), date.today())
-                            ),
-                        ],
-                    ),
-                ],
-                type="circle",
-            ),
-        ])
-    ]
+    #     # Adds a loading wrapper for loading animation
+    #     html.Div(className="loader-wrapper",children=[
+    #         dcc.Loading(
+    #             parent_className='loading_wrapper',
+    #             id="loading-2",
+    #             children=[html.Div(
+    #                     [
+    #                         dcc.Graph(
+    #                             id='map-graph',
+    #                             className="mx-0",
+    #                             figure=get_fig(date(2019, 10, 1), date.today())
+    #                         ),
+    #                     ],
+    #                 ),
+    #             ],
+    #             type="circle",
+    #         ),
+    #     ])
+    # ]
 
 
 # @app.callback(Output('page-content', 'children'),
