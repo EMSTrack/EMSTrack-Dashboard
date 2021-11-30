@@ -43,10 +43,10 @@ def display_page(href):
     # you can update your components with this URL in here
     parsed_url = urlparse(href)
     parsed_qs = parse_qs(parsed_url.query)
+    if "token" not in parsed_qs:
+        return html.Div([html.H3('Error, please log in and access dashboard through drop-down menu')])
     token = parsed_qs["token"][0]
     set_token(token) # set token in other file, global context
-    if not token:
-        return html.Div([html.H3('Authentication error, please log in')])
     return [
         html.H1(children='Dashboard', className="mb-4"),
         html.H3(id='button-clicks'),
@@ -91,18 +91,6 @@ def display_page(href):
             ),
         ])
     ]
-
-
-# @app.callback(Output('page-content', 'children'),
-#               Input('url', 'pathname'))
-# def set_api_token(url):
-#     global token
-#     app.logger.info("Setting API Token")
-#     parsed_url = urlparse(url)
-#     parsed_qs = parse_qs(parsed_url.query)
-#     token = parsed_qs["token"]
-#     app.logger.info("TOKEN: ", token)
-#     # print("TOKEN: ", token)
 
 @app.callback(
     dash.dependencies.Output('map-graph', 'figure'),
