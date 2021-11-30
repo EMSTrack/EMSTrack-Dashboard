@@ -13,7 +13,6 @@ from datetime import datetime as dt
 from haversine import haversine, Unit
 from style import * 
 import os
-from flask import request
 
 def get(url, params=None, extend=True):
     """
@@ -26,7 +25,7 @@ def get(url, params=None, extend=True):
         A json object containing HTTP GET response. 
     """
     global base_url, token
-    set_token()
+    # set_token()
     if extend == True:
         url = base_url + url
     headers = {'Content-Type': 'application/json',
@@ -46,7 +45,7 @@ def post(url, params=None, extend=True):
         A json object containing HTTP POST response. 
     """
     global base_url, token
-    set_token()
+    # set_token()
     if extend == True:
         url = base_url + url
     headers = {'Content-Type': 'application/json',
@@ -55,15 +54,12 @@ def post(url, params=None, extend=True):
     response.raise_for_status()
     return response
 
-def set_token():
+def set_token(new_token):
     """
     Sets the token for accessing the API of EMSTrack.
     """
     global token
-    url = request.url
-    parsed_url = urlparse(url)
-    parsed_qs = parse_qs(parsed_url.query)
-    token = parsed_qs["token"]
+    token = new_token
     # global token_timestamp
     # try:
     #     token_timestamp
