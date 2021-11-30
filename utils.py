@@ -61,6 +61,7 @@ def set_token(new_token):
     """
     global token
     token = new_token
+    ## old version below: 
     # global token_timestamp
     # try:
     #     token_timestamp

@@ -21,8 +21,6 @@ generate_n_clicks = False
 # Adds Bootstrap styling to application
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
-# server = Flask(__name__)
-# app = dash.Dash(server=server, external_stylesheets=external_stylesheets)
 app = dash.Dash(__name__, 
                 # server=server, 
                 external_stylesheets=external_stylesheets,
@@ -30,30 +28,26 @@ app = dash.Dash(__name__,
 server = app.server
 
 
-
 # Defines the actual layout of HTML elements on the application
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div(className="container-fluid", id="page-content",  style=main_container),
-]
-)
-
+    html.Div(className="container-fluid", id="page-content",  style=main_container, children=[
+        html.Div([html.H3('Loading...')])
+    ]),
+])
 
 @app.callback(dash.dependencies.Output('page-content', 'children'),
               [dash.dependencies.Input('url', 'href')])
 def display_page(href):
     # this is called every page load and every URL change
     # you can update your components with this URL in here
-    global token
     parsed_url = urlparse(href)
     parsed_qs = parse_qs(parsed_url.query)
     token = parsed_qs["token"][0]
-    set_token(token)
-    # print("TOKEN: ", token)
-    # return html.Div([
-    #     html.H3('Token: {}'.format(token))
-    # ])
-    return html.Div([
+    set_token(token) # set token in other file, global context
+    if not token:
+        return html.Div([html.H3('Authentication error, please log in')])
+    return [
         html.H1(children='Dashboard', className="mb-4"),
         html.H3(id='button-clicks'),
 
@@ -96,7 +90,7 @@ def display_page(href):
                 type="circle",
             ),
         ])
-    ])
+    ]
 
 
 # @app.callback(Output('page-content', 'children'),
