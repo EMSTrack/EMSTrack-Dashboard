@@ -143,7 +143,11 @@ def get_ambulances():
     ## with open("config.yml", 'r') as ymlfile:
     ##     cfg = yaml.safe_load(ymlfile)
     # cfg = cfg[SERVER]
-    mode = "dev" # change to dev if working on local machine
+    # change to dev if working on local machine
+    # if mode is dev, we directly call ucsd server, which has data
+    # if mode is prod, we call ourselves, which will have nothing if 
+    # running on local machine, but will have data when on ucsd server
+    mode = "production" 
     if mode == "dev":
         SERVER = 'UCSD'
         cfg = {
