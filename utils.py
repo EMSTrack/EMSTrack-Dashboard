@@ -151,7 +151,10 @@ def get_ambulances():
     #     "password" : os.environ["DASHBOARD_PASSWORD_" + SERVER],
     # }
     base_url = "https://localhost/en/api/"
-    res = get('ambulance')
+    try:
+        res = get('ambulance')
+    except:
+        return []
     ambulances = res.json()
     return ambulances
 
