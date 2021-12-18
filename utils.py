@@ -142,15 +142,15 @@ def get_ambulances():
     global base_url
     ## with open("config.yml", 'r') as ymlfile:
     ##     cfg = yaml.safe_load(ymlfile)
-    SERVER = 'UCSD'
+    # SERVER = 'UCSD'
     # cfg = cfg[SERVER]
-    cfg = {
+    # cfg = {
     #     "authurl" : os.environ["DASHBOARD_AUTHURL_" + SERVER],
-        "url" : os.environ["DASHBOARD_URL_" + SERVER],
+    #     "url" : os.environ["DASHBOARD_URL_" + SERVER],
     #     "username" : os.environ["DASHBOARD_USERNAME_" + SERVER],
     #     "password" : os.environ["DASHBOARD_PASSWORD_" + SERVER],
-    }
-    base_url = cfg['url']
+    # }
+    base_url = "https://localhost/en/api/"
     res = get('ambulance')
     ambulances = res.json()
     return ambulances
