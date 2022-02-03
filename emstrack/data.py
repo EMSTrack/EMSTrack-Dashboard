@@ -13,7 +13,7 @@ class EMSTrackData:
         self._ambulances = {}
 
     @property
-    def ambulances(self) -> Dict[int]:
+    def ambulances(self) -> Dict[int, dict]:
         return self._ambulances
 
     def retrieve_data(self, api_client: ApiClient, end: date = date.today(), start: date = date.today() - timedelta(days=1)):
