@@ -2,13 +2,11 @@ import os
 import unittest
 from datetime import date, timedelta
 
-import dateutil.utils
-
 from emstrack.api_client import ApiClient
-from emstrack.data import EMSTrackData
+from emstrack.util import retrieve_ambulance_data, segment_ambulance_data
 
 
-class TestApiClientAndEMSTrackData(unittest.TestCase):
+class TestApiClientAndRetrieveAmbulanceData(unittest.TestCase):
 
     def get_base_url_and_set_token(self):
 
@@ -58,20 +56,23 @@ class TestApiClientAndEMSTrackData(unittest.TestCase):
         api_client.base_url = base_url + 'api/'
         self.assertEqual(api_client.base_url, base_url + 'api/')
 
-        data = EMSTrackData()
-        data.retrieve_data(api_client)
-        self.assertIsInstance(data.ambulances, dict)
+        ambulances = retrieve_ambulance_data(api_client)
+        self.assertIsInstance(ambulances, dict)
 
         end = date.today()
         start = date.today() - timedelta(days=1)
-        data.retrieve_data(api_client, start, end)
-        self.assertIsInstance(data.ambulances, dict)
+        ambulances = retrieve_ambulance_data(api_client, start, end)
+        self.assertIsInstance(ambulances, dict)
 
-        data.retrieve_data(api_client, end, start)
-        self.assertIsInstance(data.ambulances, dict)
+        ambulances = retrieve_ambulance_data(api_client, end, start)
+        self.assertIsInstance(ambulances, dict)
 
-        for ambulance_id, ambulance in data.ambulances.items():
-            if len(ambulance['data']) > 0:
-                self.assertListEqual(ambulance['data'].columns.values.tolist(),
-                                     ['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
-                                      'location.latitude', 'location.longitude'])
+        start = date.today() - timedelta(days=10)
+        ambulances = retrieve_ambulance_data(api_client, start, end)
+        self.assertIsInstance(ambulances, dict)
+
+        for ambulance_id, ambulance in ambulances.items():
+            self.assertListEqual(ambulance['data'].columns.values.tolist(),
+                                 ['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
+                                  'location.latitude', 'location.longitude'])
+            segment_ambulance_data(ambulance['data'], 100, 60000)
