@@ -72,7 +72,7 @@ class TestApiClientAndRetrieveAmbulanceData(unittest.TestCase):
         self.assertIsInstance(ambulances, dict)
 
         for ambulance_id, ambulance in ambulances.items():
-            print(ambulance['data'])
+            print(ambulance['data'].columns.values)
             self.assertListEqual(ambulance['data'].columns.values.tolist(),
                                  ['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
                                   'location.latitude', 'location.longitude'])
