@@ -36,5 +36,5 @@ class EMSTrackData:
                                                         f'{start.isoformat()}T00:00:00.000Z,{end.isoformat()}T00:00:00.000Z'}))
 
             # store in dataframe and add color
-            ambulance.update({'data': pd.DataFrame(data),
+            ambulance.update({'data': pd.json_normalize(data),
                               'ambulance_color': generate_new_color()})
