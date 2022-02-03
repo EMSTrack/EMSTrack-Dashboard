@@ -4,6 +4,11 @@ FROM python:3.8-slim-buster
 RUN mkdir wd
 WORKDIR wd
 
+# Install dependencies
+RUN set -x && \
+    apt-get --allow-releaseinfo-change update -y && \
+    apt-get install -y rsync
+
 # Install Python dependencies.
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
