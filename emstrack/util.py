@@ -68,7 +68,8 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
             df['timestamp'] = pd.to_datetime(df['timestamp'])
             df = df.sort_values(by='timestamp', ascending=True).reset_index()
         else:
-            df = pd.DataFrame(columns=['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
+            df = pd.DataFrame(columns=['index', 'status', 'orientation', 'timestamp',
+                                       'updated_by_username', 'updated_on',
                                        'location.latitude', 'location.longitude'])
 
         # store in ambulance with new color
