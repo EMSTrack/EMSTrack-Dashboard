@@ -72,6 +72,6 @@ class TestApiClientAndEMSTrackData(unittest.TestCase):
 
         for ambulance_id, ambulance in data.ambulances.items():
             if len(ambulance['data']) > 0:
-                self.assertListEqual(ambulance['data'].columns,
+                self.assertListEqual(ambulance['data'].columns.values.tolist(),
                                      ['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
                                       'location.latitude', 'location.longitude'])
