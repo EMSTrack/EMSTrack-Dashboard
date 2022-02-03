@@ -69,3 +69,9 @@ class TestApiClientAndEMSTrackData(unittest.TestCase):
 
         data.retrieve_data(api_client, end, start)
         self.assertIsInstance(data.ambulances, dict)
+
+        for ambulance_id, ambulance in data.ambulances.items():
+            if len(ambulance['data']) > 0:
+                self.assertListEqual(ambulance['data'].columns,
+                                     ['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
+                                      'location.latitude', 'location.longitude'])

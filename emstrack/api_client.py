@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 import requests
 
@@ -10,7 +10,7 @@ class ApiClient:
         self._token = None
 
     @property
-    def token(self):
+    def token(self) -> Optional[str]:
         return self._token
 
     @token.setter
@@ -18,7 +18,7 @@ class ApiClient:
         self._token = value
 
     @property
-    def base_url(self):
+    def base_url(self) -> str:
         return self._base_url
 
     @base_url.setter

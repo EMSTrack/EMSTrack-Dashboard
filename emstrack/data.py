@@ -1,5 +1,5 @@
-from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, cast
+from datetime import date, timedelta
+from typing import Dict, cast
 
 import pandas as pd
 
@@ -13,7 +13,7 @@ class EMSTrackData:
         self._ambulances = {}
 
     @property
-    def ambulances(self):
+    def ambulances(self) -> Dict[int]:
         return self._ambulances
 
     def retrieve_data(self, api_client: ApiClient, end: date = date.today(), start: date = date.today() - timedelta(days=1)):
@@ -35,6 +35,14 @@ class EMSTrackData:
                                             params={'filter':
                                                         f'{start.isoformat()}T00:00:00.000Z,{end.isoformat()}T00:00:00.000Z'}))
 
-            # store in dataframe and add color
-            ambulance.update({'data': pd.json_normalize(data),
+            # normalize data in dataframe
+            df = pd.json_normalize(data)
+            if 'location' in df.columns:
+                # data came with empty locations, make sure location is normalized correctly
+                df['location.latitude'] = df['location']
+                df['location.longitude'] = df['location']
+                df.drop(columns='location')
+
+            # store in ambulance with new color
+            ambulance.update({'data': df,
                               'ambulance_color': generate_new_color()})
