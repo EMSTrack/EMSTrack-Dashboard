@@ -57,6 +57,13 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
             df['location.latitude'] = df['location']
             df['location.longitude'] = df['location']
             df.drop(columns='location')
+        if 'location.latitude' not in df.columns or 'location.longitude' not in df.columns:
+            # data came with empty locations, make sure location is normalized correctly
+            df['location.latitude'] = None
+            df['location.longitude'] = None
+        if 'status' not in df.columns:
+            # data came with empty locations, make sure location is normalized correctly
+            df['status'] = None
         if not df.empty:
             df['timestamp'] = pd.to_datetime(df['timestamp'])
             df = df.sort_values(by='timestamp', ascending=True).reset_index()
