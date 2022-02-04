@@ -81,12 +81,10 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
 
 def segment_ambulance_data(df: pd.DataFrame, threshold_distance_m: float, threshold_time_s: float) -> pd.DataFrame:
     """
-    Use this function to segment a dataframe obtained with retrieve_ambulance_data.
-
-    Segmentation is done based on threshold distance and time.
+    Segment a dataframe obtained with retrieve_ambulance_data. Segmentation is done based on threshold distance and time.
 
     Args:
-        df: the dataframe with ambulance data assumed to be sorted in ascending order of timestamp
+        df: the dataframe with ambulance data indexed by timestamp
         threshold_distance_m: the maximum distance in meters between two data points that is considered too far to be in the same segment
         threshold_time_s: the maximum time in s between two data points that is considered too far to be in the same segment
 
@@ -123,5 +121,16 @@ def segment_ambulance_data(df: pd.DataFrame, threshold_distance_m: float, thresh
     return df
 
 def sample_ambulance_data(df : pd.DataFrame, steps: Iterable[np.datetime64]) -> pd.DataFrame:
+    """
+    Sample the ambulance date according to the given time steps
+
+    Args:
+        df: the dataframe with ambulance data indexed by timestamp
+        steps: the time steps to sample the data
+
+    Returns:
+        A dataframe with the location at the provided step times.
+        When no location exists before a give time a row of NaN's is returned.
+    """
     return df.asof(steps, subset=['location.latitude', 'location.longitude'])
 
