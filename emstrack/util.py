@@ -67,6 +67,7 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
         if not df.empty:
             df['timestamp'] = pd.to_datetime(df['timestamp'])
             df.set_index('timestamp', inplace=True)
+            df.sort_index(inplace=True)
         else:
             df = pd.DataFrame(columns=['status', 'orientation',
                                        'updated_by_username', 'updated_on',
@@ -107,9 +108,9 @@ def segment_ambulance_data(df: pd.DataFrame, threshold_distance_m: float, thresh
         return df
 
     # calculate distances
-    distance = haversine_vector(df[['location.latitude', 'location.longitude']][:-1].values,
-                                df[['location.latitude', 'location.longitude']][1:].values, Unit.METERS)
-    times = (df.index[:-1].values - df.index[1:].values)/np.timedelta64(1,'s')
+    distance = haversine_vector(df[['location.latitude', 'location.longitude']][1:].values,
+                                df[['location.latitude', 'location.longitude']][:-1].values, Unit.METERS)
+    times = (df.index[1:].values - df.index[:-1].values)/np.timedelta64(1,'s')
 
     # augment dataframe
     df['distance_m'] = np.insert(distance, 0, 0)
@@ -121,8 +122,6 @@ def segment_ambulance_data(df: pd.DataFrame, threshold_distance_m: float, thresh
 
     return df
 
-# def sample_ambulance_data(df : pd.DataFrame, steps: Iterable[np.datetime64]) -> pd.DataFrame:
-#     # replicate dataframe data
-#     dfs = pd.DataFrame(columns=df.columns)
-#     for datetime in steps:
+def sample_ambulance_data(df : pd.DataFrame, steps: Iterable[np.datetime64]) -> pd.DataFrame:
+    return df.asof(steps, subset=['location.latitude', 'location.longitude'])
 
