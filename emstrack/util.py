@@ -68,7 +68,7 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
             df['timestamp'] = pd.to_datetime(df['timestamp'])
             df.set_index('timestamp', inplace=True)
         else:
-            df = pd.DataFrame(columns=['status', 'orientation', 'timestamp',
+            df = pd.DataFrame(columns=['status', 'orientation',
                                        'updated_by_username', 'updated_on',
                                        'location.latitude', 'location.longitude'])
 
