@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import Optional, Dict, cast
+from typing import Optional, Dict, cast, Iterable
 
 import numpy as np
 import pandas as pd
@@ -66,7 +66,7 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
             df['status'] = None
         if not df.empty:
             df['timestamp'] = pd.to_datetime(df['timestamp'])
-            df = df.sort_values(by='timestamp', ascending=True).reset_index(drop=True)
+            df.set_index('timestamp', inplace=True)
         else:
             df = pd.DataFrame(columns=['status', 'orientation', 'timestamp',
                                        'updated_by_username', 'updated_on',
@@ -78,9 +78,11 @@ def retrieve_ambulance_data(api_client: ApiClient, end: date = date.today(), sta
 
     return ambulances
 
-def segment_ambulance_data(df : pd.DataFrame, threshold_distance_m, threshold_time_s) -> pd.DataFrame:
+def segment_ambulance_data(df: pd.DataFrame, threshold_distance_m: float, threshold_time_s: float) -> pd.DataFrame:
     """
     Use this function to segment a dataframe obtained with retrieve_ambulance_data.
+
+    Segmentation is done based on threshold distance and time.
 
     Args:
         df: the dataframe with ambulance data assumed to be sorted in ascending order of timestamp
@@ -105,18 +107,22 @@ def segment_ambulance_data(df : pd.DataFrame, threshold_distance_m, threshold_ti
         return df
 
     # calculate distances
-    distance = haversine_vector(df[['location.latitude', 'location.longitude']][1:].values,
-                                df[['location.latitude', 'location.longitude']][:-1].values, Unit.METERS)
-    times = (df['timestamp'][1:].values - df['timestamp'][:-1].values)/np.timedelta64(1,'s')
+    distance = haversine_vector(df[['location.latitude', 'location.longitude']][:-1].values,
+                                df[['location.latitude', 'location.longitude']][1:].values, Unit.METERS)
+    times = (df.index[:-1].values - df.index[1:].values)/np.timedelta64(1,'s')
 
     # augment dataframe
-    df['distance_m'] = 0
-    df.loc[1:, 'distance_m'] = distance
-    df['timedelta_s'] = 0
-    df.loc[1:, 'timedelta_s'] = times
+    df['distance_m'] = np.insert(distance, 0, 0)
+    df['timedelta_s'] = np.insert(times, 0, 0)
     df['segment'] = 0
 
     # segment
     df['segment'] = np.cumsum(np.logical_or(df['distance_m'] > threshold_distance_m, df['timedelta_s'] > threshold_time_s).astype(int))
 
     return df
+
+# def sample_ambulance_data(df : pd.DataFrame, steps: Iterable[np.datetime64]) -> pd.DataFrame:
+#     # replicate dataframe data
+#     dfs = pd.DataFrame(columns=df.columns)
+#     for datetime in steps:
+

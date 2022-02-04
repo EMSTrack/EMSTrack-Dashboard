@@ -73,6 +73,6 @@ class TestApiClientAndRetrieveAmbulanceData(unittest.TestCase):
 
         for ambulance_id, ambulance in ambulances.items():
             self.assertListEqual(ambulance['data'].columns.values.tolist(),
-                                 ['status', 'orientation', 'timestamp', 'updated_by_username', 'updated_on',
+                                 ['status', 'orientation', 'updated_by_username', 'updated_on',
                                   'location.latitude', 'location.longitude'])
             segment_ambulance_data(ambulance['data'], 100, 60000)

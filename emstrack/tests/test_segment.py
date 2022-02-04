@@ -21,16 +21,16 @@ class TestSegment(unittest.TestCase):
                 'location.longitude': [lyon[1], lyon[1], lyon[1], paris[1], new_york[1]],
                 'timestamp': [now, now - timedelta(seconds=20), now - timedelta(seconds=30), now - timedelta(seconds=40), now - timedelta(seconds=50)]}
         df = pd.DataFrame(data=data)
-        df = df.sort_values(by='timestamp', ascending=True).reset_index(drop=True)
+        df.set_index('timestamp', inplace=True)
 
         # segment data
-        dfs = segment_ambulance_data(df, 300000, 30)
-        np.testing.assert_allclose(dfs['distance_m'], [0, 5853300, 392200, 0, 0], 1e-1)
-        np.testing.assert_allclose(dfs['timedelta_s'], [0, 10, 10, 10, 20])
-        np.testing.assert_allclose(dfs['segment'], [0, 1, 2, 2, 2])
+        dfs = segment_ambulance_data(df, 300000, 15)
+        np.testing.assert_allclose(dfs['distance_m'], [0, 0, 0, 392200, 5853300], 1e-1)
+        np.testing.assert_allclose(dfs['timedelta_s'], [0, 20, 10, 10, 10])
+        np.testing.assert_allclose(dfs['segment'], [0, 1, 1, 2, 3])
 
         # segment again
-        dfs = segment_ambulance_data(dfs, 300000, 30)
-        np.testing.assert_allclose(dfs['distance_m'], [0, 5853300, 392200, 0, 0], 1e-1)
-        np.testing.assert_allclose(dfs['timedelta_s'], [0, 10, 10, 10, 20])
-        np.testing.assert_allclose(dfs['segment'], [0, 1, 2, 2, 2])
+        dfs = segment_ambulance_data(dfs, 300000, 15)
+        np.testing.assert_allclose(dfs['distance_m'], [0, 0, 0, 392200, 5853300], 1e-1)
+        np.testing.assert_allclose(dfs['timedelta_s'], [0, 20, 10, 10, 10])
+        np.testing.assert_allclose(dfs['segment'], [0, 1, 1, 2, 3])
