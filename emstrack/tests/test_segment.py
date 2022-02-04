@@ -21,7 +21,7 @@ class TestSegment(unittest.TestCase):
                 'location.longitude': [lyon[1], lyon[1], lyon[1], paris[1], new_york[1]],
                 'timestamp': [now, now - timedelta(seconds=20), now - timedelta(seconds=30), now - timedelta(seconds=40), now - timedelta(seconds=50)]}
         df = pd.DataFrame(data=data)
-        df = df.sort_values(by='timestamp', ascending=True).reset_index()
+        df = df.sort_values(by='timestamp', ascending=True).reset_index(drop=True)
 
         # segment data
         dfs = segment_ambulance_data(df, 300000, 30)
