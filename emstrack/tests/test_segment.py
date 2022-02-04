@@ -49,17 +49,16 @@ class TestSegment(unittest.TestCase):
         timestamp = pd.DatetimeIndex([now, now - timedelta(seconds=20), now - timedelta(seconds=30), now - timedelta(seconds=40), now - timedelta(seconds=45)])
         df = pd.DataFrame(data=data, index=timestamp)
         df.sort_index(inplace=True)
-        print(df)
 
         # sample data
-        dfs = sample_ambulance_data(df, pd.DatetimeIndex(pd.date_range(now - timedelta(seconds=50), now, 2)))
-        print(dfs)
+        dfs = sample_ambulance_data(df, pd.date_range(now - timedelta(seconds=45), now, 2))
+        np.testing.assert_allclose(dfs[['location.latitude', 'location.longitude']].values,
+                                   np.array([new_york, lyon]))
 
-        dfs = sample_ambulance_data(df, pd.DatetimeIndex(pd.date_range(now - timedelta(seconds=50), now, 3)))
-        print(dfs)
+        dfs = sample_ambulance_data(df, pd.date_range(now - timedelta(seconds=45), now, 3))
+        np.testing.assert_allclose(dfs[['location.latitude', 'location.longitude']].values,
+                                   np.array([new_york, lyon, lyon]))
 
-        dfs = sample_ambulance_data(df, pd.DatetimeIndex(pd.date_range(now - timedelta(seconds=50), now, 4)))
-        print(dfs)
-
-        dfs = sample_ambulance_data(df, pd.DatetimeIndex(pd.date_range(now - timedelta(seconds=50), now, 5)))
-        print(dfs)
+        dfs = sample_ambulance_data(df, pd.date_range(now - timedelta(seconds=55), now, 5))
+        np.testing.assert_allclose(dfs[['location.latitude', 'location.longitude']].values,
+                                   np.array([(np.NaN, np.NaN), new_york, lyon, lyon, lyon]))

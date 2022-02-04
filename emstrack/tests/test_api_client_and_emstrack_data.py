@@ -1,9 +1,11 @@
 import os
 import unittest
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+
+import pandas as pd
 
 from emstrack.api_client import ApiClient
-from emstrack.util import retrieve_ambulance_data, segment_ambulance_data
+from emstrack.util import retrieve_ambulance_data, segment_ambulance_data, sample_ambulance_data
 
 
 class TestApiClientAndRetrieveAmbulanceData(unittest.TestCase):
@@ -71,8 +73,13 @@ class TestApiClientAndRetrieveAmbulanceData(unittest.TestCase):
         ambulances = retrieve_ambulance_data(api_client, start, end)
         self.assertIsInstance(ambulances, dict)
 
+        end_datetime = datetime.now().astimezone()
+        start_datetime = end_datetime - timedelta(days=10)
+
         for ambulance_id, ambulance in ambulances.items():
             self.assertListEqual(ambulance['data'].columns.values.tolist(),
                                  ['status', 'orientation', 'updated_by_username', 'updated_on',
                                   'location.latitude', 'location.longitude'])
             segment_ambulance_data(ambulance['data'], 100, 60000)
+            dfs = sample_ambulance_data(ambulance['data'], pd.date_range(start_datetime, end_datetime, 12*10))
+            self.assertTrue(len(dfs) == 12*10)
